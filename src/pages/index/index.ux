@@ -1,0 +1,766 @@
+<template>
+  <div class="container">
+    
+    <div if="{{!dataLoaded}}" class="loading-screen">
+      <text class="loading-txt">Loading...</text>
+    </div>
+
+    <div if="{{dataLoaded && gameState === 'PLAYING'}}" class="screen-full">
+      
+      <div class="header-main">
+        <text class="gold-val">{{formatPrice(totalGold)}}</text>
+        <div class="stats-row">
+          <text class="pps-val">{{t.pps}}: {{formatPrice(gps)}}</text>
+          <text class="rebirth-val"> | {{t.rebirth}}: {{rebirthCount}}</text>
+        </div>
+      </div>
+
+      <div class="mine-area" onclick="handleManualClick">
+        <text class="static-pop {{showClickFeedback ? 'pop-active' : ''}}">+{{formatPrice(clickPower)}}</text>
+        
+        <div class="css-ore {{ isClicking ? 'ore-hit' : '' }}">
+          <div class="ore-highlight"></div>
+        </div>
+      </div>
+
+      <div if="{{goldenOreVisible}}" class="rare-ore-box" 
+           style="left: {{goldenOreX}}px; top: {{goldenOreY}}px;" 
+           onclick="clickGoldenOre">
+        <div class="css-square-gem">
+          <div class="gem-shine-bar"></div>
+        </div>
+      </div>
+
+      <div class="footer-area">
+        <div class="rebirth-bar {{totalGold >= rebirthReq ? 'rebirth-ready' : 'rebirth-locked'}}" onclick="handleRebirth">
+          <text class="rebirth-txt-main">{{t.rebirth}}</text>
+          <text class="rebirth-cost-main">{{totalGold >= rebirthReq ? t.tapEvolve : formatPrice(rebirthReq)}}</text>
+        </div>
+
+        <div class="nav-row">
+          <div class="nav-btn btn-gold" onclick="setGameState('SHOP')">
+            <text class="btn-txt-dark">{{t.shop}}</text>
+          </div>
+          <div class="nav-btn btn-dark" onclick="setGameState('SETTINGS')">
+            <text class="btn-txt-light">{{t.settings}}</text>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div if="{{dataLoaded && gameState === 'SHOP'}}" class="screen-full shop-bg">
+      <div class="sub-header">
+        <text class="sub-title">{{t.equipShop}}</text>
+        <text class="sub-money">{{formatPrice(totalGold)}}</text>
+      </div>
+
+      <div class="shop-tabs">
+        <div class="tab-btn {{shopTab === 'click' ? 'tab-active' : ''}}" onclick="setShopTab('click')">
+          <text class="tab-txt {{shopTab === 'click' ? 'txt-active' : ''}}">{{t.manual}}</text>
+        </div>
+        <div class="tab-btn {{shopTab === 'gps' ? 'tab-active' : ''}}" onclick="setShopTab('gps')">
+          <text class="tab-txt {{shopTab === 'gps' ? 'txt-active' : ''}}">{{t.auto}}</text>
+        </div>
+      </div>
+      
+      <div class="scroll-list">
+        <block for="{{(index, item) in upgradeList}}">
+          <div if="{{item.type === shopTab}}" class="shop-item">
+            <div class="item-info">
+              <text class="item-name">{{item.name}}</text>
+            </div>
+            <div class="buy-btn {{totalGold >= item.price ? 'can-buy' : 'no-buy'}}" onclick="buyItem(index)">
+              <text class="buy-price">{{formatPrice(item.price)}}</text>
+              <text class="buy-label">{{t.buy}}</text>
+            </div>
+          </div>
+        </block>
+        <div style="height: 80px;"></div>
+      </div>
+
+      <div class="bottom-bar" onclick="setGameState('PLAYING')">
+        <text class="bar-txt">{{t.back}}</text>
+      </div>
+    </div>
+
+    <div if="{{dataLoaded && gameState === 'SETTINGS'}}" class="screen-full settings-bg">
+      <div class="sub-header">
+        <text class="sub-title">{{t.sysSettings}}</text>
+        <text class="ver-txt">{{t.version}}</text>
+      </div>
+
+      <div class="scroll-list">
+        <div class="opt-card" onclick="toggleLanguage">
+          <text class="opt-label">{{t.langLabel}}</text>
+          <text class="opt-state">{{language === 'zh-CN' ? '简' : '繁'}}</text>
+        </div>
+
+        <div class="opt-card" onclick="toggleVibration">
+          <text class="opt-label">{{t.vibration}}</text>
+          <text class="opt-state">{{vibrationEnabled ? t.on : t.off}}</text>
+        </div>
+
+        <div class="opt-card" onclick="toggleScreenKeep">
+          <text class="opt-label">{{t.screenOn}}</text>
+          <text class="opt-state">{{keepScreenOn ? t.on : t.off}}</text>
+        </div>
+        
+        <div class="opt-card" onclick="setGameState('ACHIEVEMENTS')">
+          <text class="opt-label">{{t.achTitle}}</text>
+          <text class="opt-state">>></text>
+        </div>
+
+        <div class="opt-card" onclick="openDonate">
+          <text class="opt-label" style="color: #FFD700;">{{t.donate}}</text>
+          <text class="opt-state">>></text>
+        </div>
+
+        <div class="opt-card" onclick="handleDevClick">
+          <text class="opt-label">{{t.devMode}}</text>
+          <text class="opt-state">{{t.buildVer}}</text>
+        </div>
+
+        <div class="opt-card danger-card" onclick="handleResetClick">
+          <text class="opt-label-red">{{t.deleteSave}}</text>
+          <text class="opt-state-red">{{ resetClickCount < 10 ? resetClickCount : t.reset }}</text>
+        </div>
+      </div>
+
+      <div class="bottom-bar bar-dark" onclick="setGameState('PLAYING')">
+        <text class="bar-txt-white">{{t.back}}</text>
+      </div>
+    </div>
+
+    <div if="{{dataLoaded && gameState === 'ACHIEVEMENTS'}}" class="screen-full settings-bg">
+      <div class="sub-header">
+        <text class="sub-title">{{t.achTitle}}</text>
+        <text class="sub-money">{{unlockedAchievements}}/{{achievements.length}}</text>
+      </div>
+
+      <div class="scroll-list">
+        <block for="{{achievements}}">
+          <div class="new-ach-card {{$item.unlocked ? 'ach-gold' : 'ach-gray'}}">
+            <div class="ach-icon-box">
+               <text class="ach-icon">{{$item.unlocked ? 'V' : 'X'}}</text>
+            </div>
+            <div class="ach-text-box">
+              <text class="ach-name-new">{{$item.name}}</text>
+              <text class="ach-status">{{$item.unlocked ? t.achUnlocked : t.achLocked}}</text>
+            </div>
+          </div>
+        </block>
+        <div style="height: 60px;"></div>
+      </div>
+
+      <div class="bottom-bar bar-dark" onclick="setGameState('SETTINGS')">
+        <text class="bar-txt-white">{{t.back}}</text>
+      </div>
+    </div>
+
+    <div if="{{gameState === 'DEV'}}" class="screen-full dev-bg">
+      <text class="dev-title">{{t.godMode}}</text>
+      
+      <text class="dev-section">{{t.devAddRes}}</text>
+      <div class="dev-grid">
+        <div class="dev-btn" onclick="cheatGold(100000000)"><text class="dev-txt">+100M</text></div>
+        <div class="dev-btn" onclick="cheatGold(1000000000000)"><text class="dev-txt">+1T</text></div>
+        <div class="dev-btn" onclick="cheatRebirth"><text class="dev-txt">{{t.devRebirth}}</text></div>
+        <div class="dev-btn" onclick="cheatUnlock"><text class="dev-txt">{{t.devUnlock}}</text></div>
+        <div class="dev-btn" style="border-color: #00BFFF;" onclick="cheatSpawnGem"><text class="dev-txt">{{t.devSpawnGem}}</text></div>
+      </div>
+
+      <text class="dev-section">{{t.devTeleport}}</text>
+      <div class="dev-grid">
+        <div class="dev-btn btn-blue" onclick="setGameState('SHOP')"><text class="dev-txt">{{t.devGoShop}}</text></div>
+        <div class="dev-btn btn-blue" onclick="setGameState('ACHIEVEMENTS')"><text class="dev-txt">{{t.devGoAch}}</text></div>
+        <div class="dev-btn btn-blue" onclick="setGameState('PLAYING')"><text class="dev-txt">{{t.devGoMain}}</text></div>
+      </div>
+      
+      <div class="dev-btn btn-back" onclick="setGameState('SETTINGS')">
+        <text class="dev-txt" style="color: #000;">{{t.exit}}</text>
+      </div>
+    </div>
+
+    <div if="{{showDonate}}" class="donate-overlay" onclick="closeDonate">
+      <image src="/common/donate.png" class="donate-img"></image>
+      <text class="donate-hint">{{t.tapClose}}</text>
+    </div>
+
+    <div if="{{modal.visible}}" class="modal-overlay">
+      <div class="modal-box">
+        <text class="modal-title">{{modal.title}}</text>
+        <text class="modal-msg">{{modal.message}}</text>
+        <div class="modal-btn" onclick="closeModal">
+          <text class="modal-btn-txt">{{t.confirm}}</text>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</template>
+
+<style>
+  /* === 全域設置 === */
+  .container { background-color: #000000; flex-direction: column; }
+  .screen-full { width: 100%; height: 100%; flex-direction: column; }
+  .scroll-list { flex: 1; padding: 10px 15px; flex-direction: column; }
+  
+  /* Loading Screen */
+  .loading-screen { width: 100%; height: 100%; justify-content: center; align-items: center; background-color: #000; }
+  .loading-txt { color: #FFD700; font-size: 24px; }
+
+  /* === 主畫面 === */
+  .header-main { padding: 10px 0 0; flex-direction: column; align-items: center; height: 75px; }
+  .gold-val { color: #FFD700; font-size: 40px; font-weight: bold; }
+  .stats-row { flex-direction: row; margin-top: 2px; }
+  .pps-val { color: #00BFFF; font-size: 14px; margin-right: 8px; }
+  .rebirth-val { color: #BA55D3; font-size: 14px; }
+
+  /* 礦區 */
+  .mine-area { flex: 1; justify-content: center; align-items: center; flex-direction: column; }
+    
+  .static-pop {
+    color: #FFFFFF; font-size: 32px; font-weight: bold;
+    height: 40px; margin-bottom: 5px; opacity: 0;
+    transform: scale(0.8);
+  }
+  .pop-active { opacity: 1; transform: scale(1.2); }
+
+  .css-ore {
+    width: 200px; height: 200px;
+    background-color: #FFD700; border: 6px solid #B8860B;
+    border-radius: 100px; justify-content: center; align-items: center;
+    position: relative;
+  }
+  .ore-highlight {
+    position: absolute; top: 20px; left: 40px;
+    width: 50px; height: 25px; border-radius: 20px;
+    background-color: rgba(255, 255, 255, 0.4);
+  }
+  .ore-hit { width: 190px; height: 190px; border-width: 8px; }
+
+  /* === 稀有寶石 === */
+  .rare-ore-box { 
+    position: absolute; width: 40px; height: 40px; 
+    justify-content: center; align-items: center; 
+    animation-name: pulse; animation-duration: 1.5s; animation-iteration-count: infinite; 
+  }
+  
+  .css-square-gem {
+    width: 42px; height: 42px;
+    background-color: #00BFFF; 
+    border: 4px solid #FFFFFF; 
+    border-radius: 6px; 
+    justify-content: center; align-items: center;
+    box-shadow: 0px 0px 10px #00BFFF;
+  }
+
+  .gem-shine-bar {
+    width: 20px; height: 6px;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 3px;
+    margin-right: 10px; margin-bottom: 10px;
+  }
+
+  /* 底部 */
+  .footer-area { padding: 5px 15px 15px; flex-direction: column; }
+  .rebirth-bar { 
+    width: 100%; height: 45px; border-radius: 10px; margin-bottom: 8px; 
+    flex-direction: row; justify-content: space-between; align-items: center; padding: 0 12px; 
+  }
+  .rebirth-locked { background-color: #222; border: 1px solid #333; }
+  .rebirth-ready { background-color: #4B0082; border: 1px solid #BA55D3; }
+  .rebirth-txt-main { color: #FFF; font-size: 15px; font-weight: bold; }
+  .rebirth-cost-main { color: #AAA; font-size: 13px; }
+
+  .nav-row { flex-direction: row; justify-content: space-between; }
+  .nav-btn { height: 50px; flex: 1; border-radius: 25px; justify-content: center; align-items: center; margin: 0 4px; }
+  .btn-gold { background-color: #FFD700; }
+  .btn-dark { background-color: #222; border: 1px solid #444; }
+  .btn-txt-dark { color: #000; font-size: 18px; font-weight: bold; }
+  .btn-txt-light { color: #BBB; font-size: 18px; }
+
+  /* === 商店 === */
+  .shop-bg { background-color: #080808; }
+  .sub-header { padding: 10px 20px; border-bottom: 1px solid #222; flex-direction: row; justify-content: space-between; align-items: center; }
+  .sub-title { color: #FFF; font-size: 20px; font-weight: bold; }
+  .sub-money { color: #FFD700; font-size: 14px; }
+    
+  .shop-tabs { flex-direction: row; padding: 10px 15px 0; }
+  .tab-btn { flex: 1; height: 40px; justify-content: center; align-items: center; background-color: #111; border-bottom-width: 2px; border-bottom-color: #333; }
+  .tab-active { background-color: #222; border-bottom-color: #FFD700; }
+  .tab-txt { color: #888; font-size: 16px; }
+  .txt-active { color: #FFD700; font-weight: bold; }
+
+  .shop-item { width: 100%; background-color: #121212; border-radius: 12px; padding: 10px; margin-bottom: 8px; flex-direction: row; align-items: center; border: 1px solid #262626; }
+  .item-info { flex: 1; flex-direction: column; justify-content: center; }
+  .item-name { color: #FFF; font-size: 16px; font-weight: bold; }
+  
+  .buy-btn { width: 85px; height: 50px; border-radius: 10px; flex-direction: column; justify-content: center; align-items: center; }
+  .can-buy { background-color: #FFD700; }
+  .no-buy { background-color: #333; }
+  .buy-price { color: #000; font-size: 13px; font-weight: bold; }
+  .buy-label { color: #000; font-size: 10px; }
+
+  /* === 成就卡片 === */
+  .new-ach-card { width: 100%; padding: 15px; margin-bottom: 10px; border-radius: 12px; flex-direction: row; align-items: center; }
+  .ach-gold { background-color: #2e2600; border: 1px solid #FFD700; }
+  .ach-gray { background-color: #111; border: 1px solid #333; }
+  .ach-icon-box { width: 40px; justify-content: center; align-items: center; margin-right: 10px; }
+  .ach-icon { font-size: 24px; color: #FFF; }
+  .ach-text-box { flex: 1; flex-direction: column; }
+  .ach-name-new { color: #FFF; font-size: 16px; font-weight: bold; }
+  .ach-status { color: #AAA; font-size: 10px; }
+
+  /* === 設置 === */
+  .settings-bg { background-color: #050505; }
+  .ver-txt { color: #444; font-size: 12px; }
+  .opt-card { width: 100%; padding: 15px; background-color: #111; border-radius: 10px; margin-bottom: 10px; flex-direction: row; justify-content: space-between; align-items: center; border: 1px solid #222; }
+  .opt-label { color: #DDD; font-size: 16px; }
+  .opt-state { color: #00BFFF; font-size: 16px; }
+  .danger-card { background-color: #1a0505; border-color: #400; }
+  .opt-label-red { color: #F55; font-size: 16px; }
+  .opt-state-red { color: #A44; }
+
+  /* === 捐贈全螢幕樣式 === */
+  .donate-overlay { position: absolute; left: 0; top: 0; width: 100%; height: 100%; background-color: #000000; justify-content: center; align-items: center; flex-direction: column; z-index: 999; }
+  .donate-img { width: 336px; height: 336px; object-fit: contain; }
+  .donate-hint { color: #888; font-size: 14px; margin-top: 15px; }
+
+  /* === 開發者模式 === */
+  .dev-bg { background-color: #000; padding: 10px; flex-direction: column; }
+  .dev-title { color: #0F0; font-size: 20px; font-weight: bold; align-self: center; margin-bottom: 10px; }
+  .dev-section { color: #080; font-size: 12px; margin-bottom: 5px; }
+  .dev-grid { flex-wrap: wrap; flex-direction: row; justify-content: space-between; width: 100%; margin-bottom: 15px; }
+  .dev-btn { width: 48%; height: 50px; border: 1px solid #0F0; margin-bottom: 8px; justify-content: center; align-items: center; background-color: #001100; border-radius: 6px; }
+  .btn-blue { border-color: #0AF; background-color: #001122; }
+  .dev-txt { color: #FFF; font-size: 14px; }
+  .btn-back { width: 100%; background-color: #0F0; }
+
+  /* === 彈窗與動畫 === */
+  .modal-overlay { position: absolute; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9); justify-content: center; align-items: center; flex-direction: column; }
+  .modal-box { width: 85%; background-color: #1A1A1A; border: 2px solid #FFD700; border-radius: 15px; padding: 20px; flex-direction: column; align-items: center; }
+  .modal-title { color: #FFD700; font-size: 28px; font-weight: bold; margin-bottom: 10px; text-align: center; }
+  .modal-msg { color: #FFF; font-size: 18px; margin-bottom: 20px; text-align: center; }
+  .modal-btn { width: 100px; height: 40px; background-color: #FFD700; border-radius: 20px; justify-content: center; align-items: center; }
+  .modal-btn-txt { color: #000; font-size: 18px; font-weight: bold; }
+    
+  .bottom-bar { width: 100%; height: 55px; background-color: #FFD700; justify-content: center; align-items: center; }
+  .bar-dark { background-color: #1A1A1A; border-top: 1px solid #333; }
+  .bar-txt { color: #000; font-size: 18px; font-weight: bold; }
+  .bar-txt-white { color: #FFF; font-size: 18px; }
+
+  @keyframes pulse { 0% { transform: scale(0.9); opacity: 0.8; } 50% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(0.9); opacity: 0.8; } }
+</style>
+
+<script>
+import storage from '@system.storage'
+import prompt from '@system.prompt'
+import vibrator from '@system.vibrator'
+import brightness from '@system.brightness'
+
+const I18N = {
+  'zh-CN': {
+    pps: '秒产', rebirth: '重生', equipShop: '设备采购',
+    auto: '自动', manual: '手动', shop: '商店', settings: '设置',
+    sysSettings: '系统设置', achTitle: '成就列表', devMode: '开发者', deleteSave: '删除存档',
+    confirm: '好', reset: '重置', back: '返回', exit: '退出', buy: '购买',
+    bonus: '获得额外奖励', welcome: '欢迎回来', offlineIncome: '离线收益',
+    vibration: '触感震动', screenOn: '屏幕常亮', on: '开启', off: '关闭', owned: '持有',
+    donate: '赞助开发者', tapClose: '点击任意处关闭',
+    achUnlocked: '已达成', achLocked: '未解锁',
+    tapEvolve: '点击进化', version: 'v4.2', langLabel: '语言 / Language',
+    buildVer: 'super_noob',
+    godMode: '上帝模式', devAddRes: '添加资源', devRebirth: '重生+1', devUnlock: '全部解锁',
+    devSpawnGem: '生成宝石',
+    devTeleport: '传送 (界面测试)', devGoShop: '去商店', devGoAch: '去成就', devGoMain: '去主页',
+    msgRebirthTitle: '重生成功!', msgRebirthContent: '效率翻倍 (x2)',
+    msgRich: '一夜暴富!', msgEvolved: '进化完成', msgUnlocked: '全部已解锁', msgResetDone: '重置完成',
+    msgBuyOk: '购买成功',
+    item_pick: '生锈镐头', item_bird: '金丝雀', item_drill: '蒸汽钻头', item_miner: '初级矿工',
+    item_cart: '矿车队', item_excavator: '挖掘机', item_tnt: '炸药专家', item_laser: '雷射钻井',
+    item_quantum: '量子核心', item_nano: '纳米机器人', item_ai: 'AI 矿工', item_fusion: '冷核聚变',
+    item_hole: '黑洞开采', item_dimension: '维度撕裂者',
+    ach_warmup: '手指热身 (100点)', ach_click_500: '手指过热 (500点)', ach_click_5k: '鼠标破坏者 (5k点)',
+    ach_gem_5: '宝石猎人 (5颗)', ach_gem_20: '宝石大亨 (20颗)',
+    ach_first: '第一桶金 (10k)', ach_gold_1m: '百万富翁 (1M)', ach_gold_1b: '矿业大亨 (1B)', ach_trillion: '兆万富翁 (1T)',
+    ach_auto: '自动化 (100/s)', ach_gps_5k: '工业革命 (5k/s)', ach_gps_1m: '奇点能量 (1M/s)',
+    ach_traveler: '时空旅人 (1重生)', ach_rebirth_5: '轮回大师 (5重生)'
+  },
+  'zh-TW': {
+    pps: '秒產', rebirth: '重生', equipShop: '設備採購',
+    auto: '自動', manual: '手動', shop: '商店', settings: '設置',
+    sysSettings: '系統設置', achTitle: '成就列表', devMode: '開發者', deleteSave: '刪除存檔',
+    confirm: '好', reset: '重置', back: '返回', exit: '退出', buy: '購買',
+    bonus: '獲得額外獎勵', welcome: '歡迎回來', offlineIncome: '離線收益',
+    vibration: '觸感震動', screenOn: '螢幕常亮', on: '開啟', off: '關閉', owned: '持有',
+    donate: '贊助開發者', tapClose: '點擊任意處關閉',
+    achUnlocked: '已達成', achLocked: '未解鎖',
+    tapEvolve: '點擊進化', version: 'v4.2', langLabel: '語言 / Language',
+    buildVer: 'super_noob',
+    godMode: '上帝模式', devAddRes: '添加資源', devRebirth: '重生+1', devUnlock: '全部解鎖',
+    devSpawnGem: '生成寶石',
+    devTeleport: '傳送 (介面測試)', devGoShop: '去商店', devGoAch: '去成就', devGoMain: '去主頁',
+    msgRebirthTitle: '重生成功!', msgRebirthContent: '效率翻倍 (x2)',
+    msgRich: '一夜暴富!', msgEvolved: '進化完成', msgUnlocked: '全部已解鎖', msgResetDone: '重置完成',
+    msgBuyOk: '購買成功',
+    item_pick: '生鏽鎬頭', item_bird: '金絲雀', item_drill: '蒸汽鑽頭', item_miner: '初級礦工',
+    item_cart: '礦車隊', item_excavator: '挖掘機', item_tnt: '炸藥專家', item_laser: '雷射鑽井',
+    item_quantum: '量子核心', item_nano: '奈米機器人', item_ai: 'AI 礦工', item_fusion: '冷核聚變',
+    item_hole: '黑洞開採', item_dimension: '維度撕裂者',
+    ach_warmup: '手指熱身 (100點)', ach_click_500: '手指過熱 (500點)', ach_click_5k: '滑鼠破壞者 (5k點)',
+    ach_gem_5: '寶石獵人 (5顆)', ach_gem_20: '寶石大亨 (20顆)',
+    ach_first: '第一桶金 (10k)', ach_gold_1m: '百萬富翁 (1M)', ach_gold_1b: '礦業大亨 (1B)', ach_trillion: '兆萬富翁 (1T)',
+    ach_auto: '自動化 (100/s)', ach_gps_5k: '工業革命 (5k/s)', ach_gps_1m: '奇點能量 (1M/s)',
+    ach_traveler: '時空旅人 (1重生)', ach_rebirth_5: '輪迴大師 (5重生)'
+  }
+};
+
+export default {
+  private: {
+    dataLoaded: false, // 關鍵優化：增加載入狀態
+    language: 'zh-CN',
+    t: {},
+    modal: { visible: false, title: '', message: '' },
+    gameState: 'PLAYING',
+    shopTab: 'click',
+    showDonate: false,
+
+    totalGold: 0,
+    gps: 0,
+    clickPower: 1,
+    rebirthCount: 0,
+    rebirthReq: 10000,
+    
+    isClicking: false,
+    showClickFeedback: false, 
+    clickFeedbackTimer: null,
+    
+    goldenOreVisible: false,
+    goldenOreX: 50, goldenOreY: 50, goldenOreTimer: null,
+    goldenOreClickCount: 0,
+
+    vibrationEnabled: true,
+    keepScreenOn: true,
+    lastSaveTime: 0,
+    lastCheckTime: 0, // 優化：增加檢查時間戳
+    devClickCount: 0,
+    resetClickCount: 10,
+    totalClicks: 0,
+    
+    unlockedAchievements: 0,
+    achievements: [
+      { id: 'c_100', key: 'ach_warmup', name: '', condition: (d) => d.totalClicks >= 100, unlocked: false },
+      { id: 'c_500', key: 'ach_click_500', name: '', condition: (d) => d.totalClicks >= 500, unlocked: false },
+      { id: 'c_5k', key: 'ach_click_5k', name: '', condition: (d) => d.totalClicks >= 5000, unlocked: false },
+      { id: 'gem_5', key: 'ach_gem_5', name: '', condition: (d) => d.goldenOreClickCount >= 5, unlocked: false },
+      { id: 'gem_20', key: 'ach_gem_20', name: '', condition: (d) => d.goldenOreClickCount >= 20, unlocked: false },
+      { id: 'g_10k', key: 'ach_first', name: '', condition: (d) => d.totalGold >= 10000, unlocked: false },
+      { id: 'g_1m', key: 'ach_gold_1m', name: '', condition: (d) => d.totalGold >= 1000000, unlocked: false },
+      { id: 'g_1b', key: 'ach_gold_1b', name: '', condition: (d) => d.totalGold >= 1000000000, unlocked: false },
+      { id: 'g_1t', key: 'ach_trillion', name: '', condition: (d) => d.totalGold >= 1000000000000, unlocked: false },
+      { id: 'gps_100', key: 'ach_auto', name: '', condition: (d) => d.gps >= 100, unlocked: false },
+      { id: 'gps_5k', key: 'ach_gps_5k', name: '', condition: (d) => d.gps >= 5000, unlocked: false },
+      { id: 'gps_1m', key: 'ach_gps_1m', name: '', condition: (d) => d.gps >= 1000000, unlocked: false },
+      { id: 'rb_1', key: 'ach_traveler', name: '', condition: (d) => d.rebirthCount >= 1, unlocked: false },
+      { id: 'rb_5', key: 'ach_rebirth_5', name: '', condition: (d) => d.rebirthCount >= 5, unlocked: false }
+    ],
+
+    upgradeList: [
+      { key: 'item_pick', name: "", basePrice: 15, price: 15, owned: 0, power: 1, type: 'click' },
+      { key: 'item_bird', name: "", basePrice: 100, price: 100, owned: 0, power: 2, type: 'gps' },
+      { key: 'item_drill', name: "", basePrice: 500, price: 500, owned: 0, power: 10, type: 'click' },
+      { key: 'item_miner', name: "", basePrice: 1000, price: 1000, owned: 0, power: 15, type: 'gps' },
+      { key: 'item_cart', name: "", basePrice: 5000, price: 5000, owned: 0, power: 60, type: 'click' },
+      { key: 'item_excavator', name: "", basePrice: 15000, price: 15000, owned: 0, power: 120, type: 'gps' },
+      { key: 'item_tnt', name: "", basePrice: 50000, price: 50000, owned: 0, power: 400, type: 'click' },
+      { key: 'item_laser', name: "", basePrice: 200000, price: 200000, owned: 0, power: 1500, type: 'gps' },
+      { key: 'item_quantum', name: "", basePrice: 1000000, price: 1000000, owned: 0, power: 8000, type: 'click' },
+      { key: 'item_nano', name: "", basePrice: 50000000, price: 50000000, owned: 0, power: 50000, type: 'gps' },
+      { key: 'item_ai', name: "", basePrice: 250000000, price: 250000000, owned: 0, power: 300000, type: 'click' },
+      { key: 'item_fusion', name: "", basePrice: 1000000000, price: 1000000000, owned: 0, power: 1500000, type: 'gps' },
+      { key: 'item_hole', name: "", basePrice: 10000000000, price: 10000000000, owned: 0, power: 20000000, type: 'click' },
+      { key: 'item_dimension', name: "", basePrice: 50000000000, price: 50000000000, owned: 0, power: 100000000, type: 'gps' }
+    ]
+  },
+
+  onInit() {
+    this.refreshStrings();
+    // 延遲一點加載，確保 UI 框架就緒
+    setTimeout(() => {
+        this.loadData();
+    }, 50);
+
+    // 主循環
+    setInterval(() => {
+      // 1. 高頻任務：金幣計算 (為了視覺平滑，保持 100ms)
+      if (this.gps > 0) {
+        this.totalGold += (this.gps / 10);
+      }
+
+      // 2. 低頻任務：節流處理 (每 1 秒執行一次)
+      let now = new Date().getTime();
+      if (now - this.lastCheckTime > 1000) {
+        this.lastCheckTime = now;
+        
+        // 自動存檔 (每 5 秒，透過餘數判斷)
+        if (now - this.lastSaveTime > 5000) {
+           this.saveData();
+        }
+
+        // 檢查成就 (不必每 0.1 秒檢查，每秒一次足夠)
+        this.checkAchievements();
+
+        // 寶石生成判定 (機率調整為適應 1 秒的間隔)
+        if (!this.goldenOreVisible && Math.random() < 0.008) { // 原本是 0.0008 * 10
+           this.spawnGoldenOre();
+        }
+      }
+    }, 100);
+  },
+
+  setShopTab(tab) { this.shopTab = tab; },
+  showModal(title, message) { this.modal.title = title; this.modal.message = message; this.modal.visible = true; },
+  closeModal() { this.modal.visible = false; },
+  
+  openDonate() { this.showDonate = true; },
+  closeDonate() { this.showDonate = false; },
+
+  toggleLanguage() {
+    this.language = this.language === 'zh-CN' ? 'zh-TW' : 'zh-CN';
+    this.refreshStrings(); this.saveData();
+  },
+  toggleVibration() { this.vibrationEnabled = !this.vibrationEnabled; this.saveData(); },
+  
+  toggleScreenKeep() {
+    this.keepScreenOn = !this.keepScreenOn;
+    this.applyScreenMode();
+    this.saveData();
+  },
+  
+  applyScreenMode() {
+    try {
+      brightness.setKeepScreenOn({ keepScreenOn: this.keepScreenOn });
+    } catch(e) { console.error('Screen error', e); }
+  },
+
+  refreshStrings() {
+    this.t = I18N[this.language];
+    this.upgradeList.forEach(item => { if (this.t[item.key]) item.name = this.t[item.key]; });
+    this.achievements.forEach(ach => { if (this.t[ach.key]) ach.name = this.t[ach.key]; });
+  },
+
+  handleManualClick() {
+    this.totalGold += this.clickPower;
+    this.totalClicks++;
+    
+    // 點擊反饋優化：防止頻繁設定 Timer 造成卡頓
+    this.isClicking = true;
+    if (!this.showClickFeedback) {
+        this.showClickFeedback = true;
+        if (this.clickFeedbackTimer) clearTimeout(this.clickFeedbackTimer);
+        this.clickFeedbackTimer = setTimeout(() => {
+          this.isClicking = false;
+          this.showClickFeedback = false; 
+        }, 150); // 加快反饋消失速度
+    }
+
+    if (this.vibrationEnabled) {
+      vibrator.vibrate({ mode: 'short' });
+    }
+  },
+
+  spawnGoldenOre() {
+    if (this.goldenOreTimer) clearTimeout(this.goldenOreTimer);
+    this.goldenOreX = 65 + Math.random() * 120; 
+    this.goldenOreY = 65 + Math.random() * 120;
+    this.goldenOreVisible = true;
+    this.goldenOreTimer = setTimeout(() => { this.goldenOreVisible = false; }, 8000);
+  },
+    
+  clickGoldenOre() {
+    if (!this.goldenOreVisible) return;
+    this.goldenOreVisible = false;
+    let bonus = Math.max(1000, this.gps * 300);
+    this.totalGold += bonus;
+    this.goldenOreClickCount++;
+    
+    if(this.vibrationEnabled) vibrator.vibrate({ mode: 'long' });
+    prompt.showToast({ message: this.t.bonus + ' +' + this.formatPrice(bonus) });
+    // 點擊寶石後立即檢查一次成就
+    this.checkAchievements();
+  },
+
+  checkAchievements() {
+    let unlockedCount = 0;
+    let hasNew = false;
+    
+    // 優化：只檢查那些尚未解鎖的成就
+    this.achievements.forEach(ach => {
+      if (ach.unlocked) {
+        unlockedCount++;
+      } else if (ach.condition(this)) {
+        ach.unlocked = true;
+        unlockedCount++;
+        hasNew = true;
+        prompt.showToast({ message: ach.name });
+      }
+    });
+    
+    // 只有在數量變化時才更新視圖
+    if (unlockedCount !== this.unlockedAchievements) {
+        this.unlockedAchievements = unlockedCount;
+        if (hasNew && this.vibrationEnabled) vibrator.vibrate({ mode: 'short' });
+    }
+  },
+
+  buyItem(idx) {
+    let item = this.upgradeList[idx];
+    if (this.totalGold >= item.price) {
+      this.totalGold -= item.price;
+      item.owned++;
+      item.price = Math.floor(item.basePrice * Math.pow(1.3, item.owned));
+      this.updateStats(); 
+      this.saveData();
+      prompt.showToast({ message: this.t.msgBuyOk });
+      
+      // 購買後檢查一次成就即可，不用放在 Loop 裡
+      this.checkAchievements(); 
+    }
+  },
+
+  handleRebirth() {
+    if (this.totalGold >= this.rebirthReq) {
+      this.rebirthCount++;
+      this.rebirthReq *= 5;
+      this.totalGold = 0;
+      this.upgradeList.forEach(u => { u.owned = 0; u.price = u.basePrice; });
+      this.updateStats(); this.saveData();
+      this.showModal(this.t.msgRebirthTitle, this.t.msgRebirthContent);
+    }
+  },
+
+  updateStats() {
+    let rawGps = 0, rawClick = 1;
+    this.upgradeList.forEach(u => {
+      if (u.type === 'gps') rawGps += (u.owned * u.power);
+      else rawClick += (u.owned * u.power);
+    });
+    let mult = 1 + this.rebirthCount;
+    this.gps = rawGps * mult;
+    this.clickPower = rawClick * mult;
+  },
+
+  formatPrice(p) {
+    if (!p) return "0"; // 安全檢查
+    if (p >= 1e12) return (p/1e12).toFixed(2) + 'T';
+    if (p >= 1e9) return (p/1e9).toFixed(2) + 'B';
+    if (p >= 1e6) return (p/1e6).toFixed(2) + 'M';
+    if (p >= 1e3) return (p/1e3).toFixed(1) + 'K';
+    return Math.floor(p).toString();
+  },
+    
+  handleDevClick() {
+    this.devClickCount++;
+    if (this.devClickCount >= 10) { 
+      this.gameState = 'DEV';
+      this.devClickCount = 0;
+    }
+  },
+    
+  cheatGold(amount) { this.totalGold += amount; prompt.showToast({message: this.t.msgRich}); },
+  cheatRebirth() { this.rebirthCount += 1; this.updateStats(); prompt.showToast({message: this.t.msgEvolved}); },
+  cheatUnlock() { this.achievements.forEach(a => a.unlocked = true); prompt.showToast({message: this.t.msgUnlocked}); },
+  
+  cheatSpawnGem() { 
+    this.spawnGoldenOre();
+    this.setGameState('PLAYING');
+  },
+    
+  handleResetClick() {
+    this.resetClickCount--;
+    if (this.resetClickCount <= 0) {
+      storage.delete({ key: 'mine_save_v2' });
+      this.totalGold = 0; this.rebirthCount = 0; this.rebirthReq = 10000; this.totalClicks = 0;
+      this.goldenOreClickCount = 0; 
+      this.upgradeList.forEach(u => { u.owned = 0; u.price = u.basePrice; });
+      this.achievements.forEach(a => a.unlocked = false);
+      this.updateStats(); 
+      this.resetClickCount = 10;
+      prompt.showToast({ message: this.t.msgResetDone });
+    }
+  },
+  setGameState(s) { this.gameState = s; this.resetClickCount = 10; },
+
+  saveData() {
+    this.lastSaveTime = new Date().getTime();
+    const data = { 
+      lang: this.language,
+      g: this.totalGold, 
+      r: this.rebirthCount, 
+      q: this.rebirthReq, 
+      ups: this.upgradeList.map(u => u.owned), 
+      t: this.lastSaveTime, 
+      tc: this.totalClicks, 
+      gc: this.goldenOreClickCount,
+      achs: this.achievements.map(a => a.unlocked), 
+      v: this.vibrationEnabled,
+      k: this.keepScreenOn
+    };
+    storage.set({ key: 'mine_save_v2', value: JSON.stringify(data) });
+  },
+  
+  loadData() {
+    storage.get({ key: 'mine_save_v2', success: (res) => {
+      if (res) {
+        try {
+            const d = JSON.parse(res);
+            if (d.lang) this.language = d.lang;
+            this.refreshStrings();
+            this.totalGold = d.g || 0;
+            this.rebirthCount = d.r || 0;
+            this.rebirthReq = d.q || 10000;
+            this.totalClicks = d.tc || 0;
+            this.goldenOreClickCount = d.gc || 0;
+            this.vibrationEnabled = d.v !== undefined ? d.v : true;
+            this.keepScreenOn = d.k !== undefined ? d.k : true;
+            
+            this.applyScreenMode();
+
+            if (d.ups) d.ups.forEach((o, i) => { 
+            if(this.upgradeList[i]) {
+                this.upgradeList[i].owned = o;
+                this.upgradeList[i].price = Math.floor(this.upgradeList[i].basePrice * Math.pow(1.3, o));
+            }
+            });
+
+            if (d.achs) d.achs.forEach((unlocked, i) => { 
+                if (this.achievements[i]) this.achievements[i].unlocked = unlocked; 
+            });
+            this.updateStats(); // 先更新數值
+            
+            // 離線收益計算
+            if (d.t) {
+            let s = (new Date().getTime() - d.t) / 1000;
+            if (s > 60 && this.gps > 0) {
+                let earn = Math.floor(s * this.gps);
+                this.totalGold += earn;
+                // 這裡用 setTimeout 避免模態框在渲染前彈出
+                setTimeout(() => {
+                    this.showModal(this.t.welcome, this.t.offlineIncome + ': $' + this.formatPrice(earn));
+                }, 500);
+            }
+            }
+        } catch(e) {
+            console.error("Load failed", e);
+        }
+      }
+      // 數據處理完畢，開放渲染
+      this.dataLoaded = true;
+    }, fail: () => {
+        // 讀檔失敗也要開放渲染(新玩家)
+        this.dataLoaded = true;
+    }});
+  }
+}
+</script>

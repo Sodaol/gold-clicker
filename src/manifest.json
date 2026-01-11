@@ -1,0 +1,36 @@
+{
+  "package": "com.supernoob.gold",
+  "name": "gold clicker",
+  "versionName": "4.2.0",
+  "versionCode": 5,
+  "minPlatformVersion": 1000,
+  "icon": "/common/logo.png",
+  "deviceTypeList": [
+    "watch"
+  ],
+  "features": [
+    {
+      "name": "system.storage"
+    },
+    {
+      "name": "system.prompt"
+    },
+    {
+      "name": "system.vibrator"
+    },
+    { "name": "system.brightness"}
+  ],
+  "config": {
+    "logLevel": "error",
+    "designWidth": 336,
+    "backGesturePassThrough": false
+  },
+  "router": {
+    "entry": "pages/index",
+    "pages": {
+      "pages/index": {
+        "component": "index"
+      }
+    }
+  }
+}
