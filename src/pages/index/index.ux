@@ -2,10 +2,11 @@
   <div class="container">
     
     <div if="{{!dataLoaded}}" class="loading-screen">
-      <text class="loading-txt">SYSTEM LOADING...</text>
+      <text class="loading-txt">Loading...</text>
     </div>
 
     <div if="{{dataLoaded && gameState === 'PLAYING'}}" class="screen-full">
+      
       <div class="header-main">
         <text class="gold-val">{{formatPrice(totalGold)}}</text>
         <div class="stats-row">
@@ -16,6 +17,7 @@
 
       <div class="mine-area" onclick="handleManualClick">
         <text class="static-pop {{showClickFeedback ? 'pop-active' : ''}}">+{{formatPrice(clickPower)}}</text>
+        
         <div class="css-ore {{ isClicking ? 'ore-hit' : '' }}">
           <div class="ore-highlight"></div>
         </div>
@@ -24,16 +26,17 @@
       <div if="{{goldenOreVisible}}" class="rare-ore-box" 
            style="left: {{goldenOreX}}px; top: {{goldenOreY}}px;"
            onclick="clickGoldenOre">
-        <div class="css-square-gem"><div class="gem-shine-bar"></div></div>
+        <div class="css-square-gem">
+          <div class="gem-shine-bar"></div>
+        </div>
       </div>
 
       <div class="footer-area">
-        <div if="{{!hideRebirthBtn}}" class="rebirth-bar {{totalGold >= rebirthReq ? 'rebirth-ready' : 'rebirth-locked'}}" onclick="handleRebirth">
-          <div style="flex-direction: column;">
-             <text class="rebirth-txt-main">{{t.rebirth}}</text>
-             <text class="rebirth-cost-main">{{totalGold >= rebirthReq ? t.tapEvolve : formatPrice(rebirthReq)}}</text>
-          </div>
-          <text class="rebirth-arrow" if="{{totalGold >= rebirthReq}}">▲</text>
+        <div if="{{!hideRebirthBtn}}" 
+             class="rebirth-bar {{totalGold >= rebirthReq ? 'rebirth-ready' : 'rebirth-locked'}}" 
+             onclick="handleRebirth">
+          <text class="rebirth-txt-main">{{t.rebirth}}</text>
+          <text class="rebirth-cost-main">{{totalGold >= rebirthReq ? '>>> ' + t.tapEvolve + ' <<<' : t.req + ': ' + formatPrice(rebirthReq)}}</text>
         </div>
 
         <div class="nav-row">
@@ -64,77 +67,85 @@
           <text class="tab-txt {{shopTab === 'gps' ? 'txt-active' : ''}}">{{t.auto}}</text>
         </div>
         <div class="tab-btn {{shopTab === 'rebirth' ? 'tab-active' : ''}}" onclick="setShopTab('rebirth')">
-          <text class="tab-txt {{shopTab === 'rebirth' ? 'txt-active-purple' : ''}}">{{t.store_rebirth}}</text>
+          <text class="tab-txt {{shopTab === 'rebirth' ? 'txt-active-purple' : ''}}" style="{{shopTab === 'rebirth' ? 'color:#BA55D3;' : ''}}">{{t.store_rebirth}}</text>
         </div>
       </div>
 
       <div class="pagination-bar">
-        <div class="page-btn" onclick="changePage(-1)"><text class="page-btn-txt">&lt;</text></div>
+        <div class="page-btn" onclick="changePage(-1)">
+          <text class="page-btn-txt">&lt;</text>
+        </div>
         <text class="page-info">{{shopPage + 1}} / {{maxPage + 1}}</text>
-        <div class="page-btn" onclick="changePage(1)"><text class="page-btn-txt">&gt;</text></div>
+        <div class="page-btn" onclick="changePage(1)">
+          <text class="page-btn-txt">&gt;</text>
+        </div>
       </div>
       
       <div class="scroll-list">
         <block for="{{(index, item) in visibleItems}}">
-          <div class="shop-item {{item.type === 'rebirth_buff' ? 'shop-item-purple' : ''}}" onclick="buyItem(item)">
+          <div class="shop-item {{item.type === 'rebirth_buff' ? 'shop-item-purple' : ''}}">
             <div class="item-info">
               <text class="item-name">{{item.name}}</text>
               <text class="item-owned" if="{{item.type !== 'rebirth_buff'}}">{{t.owned}}: {{item.owned}} | +{{formatPrice(item.power)}}</text>
               <text class="item-desc-purple" if="{{item.type === 'rebirth_buff'}}">{{t.owned}}: {{item.owned}} | {{item.desc}}</text>
             </div>
-            <div class="buy-btn {{ (item.type === 'rebirth_buff' ? rebirthCount >= item.price : totalGold >= item.price) ? (item.type === 'rebirth_buff' ? 'btn-purple' : 'can-buy') : 'no-buy' }}">
+
+            <div class="buy-btn {{ (item.type === 'rebirth_buff' ? rebirthCount >= item.price : totalGold >= item.price) ? (item.type === 'rebirth_buff' ? 'btn-purple' : 'can-buy') : 'no-buy' }}" 
+                 onclick="buyItem(item)">
               <text class="buy-price" if="{{item.type !== 'rebirth_buff'}}">{{formatPrice(item.price)}}</text>
               <text class="buy-price-white" if="{{item.type === 'rebirth_buff'}}">R: {{item.price}}</text>
-              <text class="buy-label" style="{{item.type === 'rebirth_buff' ? 'color:#EEE;' : 'color:#000;'}}">{{t.buy}}</text>
+              <text class="buy-label" style="{{item.type === 'rebirth_buff' ? 'color:#EEE;' : ''}}">{{t.buy}}</text>
             </div>
           </div>
         </block>
+        
         <div if="{{visibleItems.length === 0}}" style="padding: 20px; align-items: center;">
              <text style="color: #666;">Empty Page</text>
         </div>
-        <div style="height: 60px;"></div>
+        <div style="height: 80px;"></div>
       </div>
-      <div class="bottom-bar" onclick="setGameState('PLAYING')"><text class="bar-txt">{{t.back}}</text></div>
+
+      <div class="bottom-bar" onclick="setGameState('PLAYING')">
+        <text class="bar-txt">{{t.back}}</text>
+      </div>
     </div>
 
     <div if="{{dataLoaded && gameState === 'SETTINGS'}}" class="screen-full settings-bg">
       <div class="sub-header">
         <text class="sub-title">{{t.sysSettings}}</text>
+        <text class="ver-txt">{{t.version}}</text>
       </div>
 
       <div class="scroll-list">
-        <div class="opt-card" onclick="setGameState('PREFERENCES')">
-          <text class="opt-label">{{t.prefs}}</text>
-          <text class="opt-state">>></text>
-        </div>
-
         <div class="opt-card" onclick="toggleLanguage">
           <text class="opt-label">{{t.langLabel}}</text>
           <text class="opt-state">{{language === 'zh-CN' ? '简' : '繁'}}</text>
         </div>
-
+        <div class="opt-card" onclick="setGameState('PREFERENCES')">
+          <text class="opt-label">{{t.prefs}}</text>
+          <text class="opt-state">>></text>
+        </div>
         <div class="opt-card" onclick="setGameState('SAVES')">
           <text class="opt-label">{{t.saveMan}}</text>
           <text class="opt-state">>></text>
         </div>
-        
-        <div class="opt-card ach-card-gold" onclick="setGameState('ACHIEVEMENTS')">
-          <text class="opt-label-gold">{{t.achTitle}}</text>
-          <text class="opt-state-gold">&lt;&lt;</text>
+        <div class="opt-card" onclick="setGameState('ACHIEVEMENTS')">
+          <text class="opt-label">{{t.achTitle}}</text>
+          <text class="opt-state">>></text>
         </div>
-
         <div class="opt-card" onclick="openDonate">
           <text class="opt-label" style="color: #FFD700;">{{t.donate}}</text>
           <text class="opt-state">>></text>
         </div>
-
         <div class="opt-card danger-card" onclick="handleResetClick">
           <text class="opt-label-red">{{t.deleteSave}}</text>
           <text class="opt-state-red">{{ resetClickCount < 10 ? resetClickCount : t.reset }}</text>
         </div>
       </div>
 
-      <div class="bottom-bar bar-dark" onclick="setGameState('PLAYING')"><text class="bar-txt-white">{{t.back}}</text></div>
+      <div class="bottom-bar bar-dark" onclick="setGameState('PLAYING')">
+        <text class="bar-txt-white">{{t.back}}</text>
+      </div>
     </div>
 
     <div if="{{dataLoaded && gameState === 'PREFERENCES'}}" class="screen-full settings-bg">
@@ -142,40 +153,47 @@
         <text class="sub-title">{{t.prefs}}</text>
       </div>
       <div class="scroll-list">
-        <div class="opt-card" onclick="toggleVibration">
-          <text class="opt-label">{{t.vibration}}</text>
-          <text class="opt-state">{{vibrationEnabled ? t.on : t.off}}</text>
-        </div>
-
-        <div class="opt-card" onclick="toggleScreenKeep">
-          <text class="opt-label">{{t.screenOn}}</text>
-          <text class="opt-state">{{keepScreenOn ? t.on : t.off}}</text>
-        </div>
-
         <div class="opt-card" onclick="toggleRebirthBtn">
           <text class="opt-label">{{t.hideRebirthLabel}}</text>
           <text class="opt-state">{{hideRebirthBtn ? t.on : t.off}}</text>
         </div>
+        <div class="opt-card" onclick="toggleVibration">
+          <text class="opt-label">{{t.vibration}}</text>
+          <text class="opt-state">{{vibrationEnabled ? t.on : t.off}}</text>
+        </div>
+        <div class="opt-card" onclick="toggleScreenKeep">
+          <text class="opt-label">{{t.screenOn}}</text>
+          <text class="opt-state">{{keepScreenOn ? t.on : t.off}}</text>
+        </div>
       </div>
-      <div class="bottom-bar bar-dark" onclick="setGameState('SETTINGS')"><text class="bar-txt-white">{{t.back}}</text></div>
+      <div class="bottom-bar bar-dark" onclick="setGameState('SETTINGS')">
+        <text class="bar-txt-white">{{t.back}}</text>
+      </div>
     </div>
 
     <div if="{{dataLoaded && gameState === 'SAVES'}}" class="screen-full settings-bg">
-      <div class="sub-header"><text class="sub-title">{{t.saveMan}}</text></div>
+      <div class="sub-header">
+        <text class="sub-title">{{t.saveMan}}</text>
+      </div>
       <div class="scroll-list">
         <block for="{{(index, info) in slotsInfo}}">
           <div class="opt-card {{currentSaveSlot === index ? 'slot-active' : ''}}" onclick="switchSlot(index)">
-            <div style="flex-direction: column; flex: 1;">
-              <text class="opt-label {{currentSaveSlot === index ? 'txt-active' : ''}}">{{t.slot}} {{index + 1}}</text>
-              <text class="slot-desc" if="{{info}}">G: {{info.g}} | R: {{info.r}}</text>
+            <div style="flex-direction: column;">
+              <text class="opt-label {{currentSaveSlot === index ? 'txt-active' : ''}}">
+                {{t.slot}} {{index + 1}} {{currentSaveSlot === index ? '(' + t.current + ')' : ''}}
+              </text>
+              <text class="slot-desc" if="{{info}}">{{info.summary}}</text>
+              <text class="slot-date" if="{{info}}">{{info.date}}</text>
               <text class="slot-desc" if="{{!info}}">{{t.empty}}</text>
             </div>
-            <text class="opt-state" if="{{currentSaveSlot === index}}">{{t.current}}</text>
             <text class="opt-state" if="{{currentSaveSlot !== index}}">{{t.load}}</text>
+            <text class="opt-state" if="{{currentSaveSlot === index}}">OK</text>
           </div>
         </block>
       </div>
-      <div class="bottom-bar bar-dark" onclick="setGameState('SETTINGS')"><text class="bar-txt-white">{{t.back}}</text></div>
+      <div class="bottom-bar bar-dark" onclick="setGameState('SETTINGS')">
+        <text class="bar-txt-white">{{t.back}}</text>
+      </div>
     </div>
 
     <div if="{{dataLoaded && gameState === 'ACHIEVEMENTS'}}" class="screen-full settings-bg">
@@ -186,129 +204,170 @@
       <div class="scroll-list">
         <block for="{{achievements}}">
           <div class="new-ach-card {{$item.unlocked ? 'ach-gold' : 'ach-gray'}}">
-            <div class="ach-icon-box"><text class="ach-icon">{{$item.unlocked ? '★' : ''}}</text></div>
+            <div class="ach-icon-box">
+               <text class="ach-icon">{{$item.unlocked ? 'V' : 'X'}}</text>
+            </div>
             <div class="ach-text-box">
-              <text class="ach-name-new" style="{{$item.unlocked ? 'color:#FFF' : 'color:#555'}}">{{$item.name}}</text>
+              <text class="ach-name-new">{{$item.name}}</text>
               <text class="ach-status">{{$item.unlocked ? t.achUnlocked : t.achLocked}}</text>
             </div>
           </div>
         </block>
         <div style="height: 60px;"></div>
       </div>
-      <div class="bottom-bar bar-dark" onclick="setGameState('SETTINGS')"><text class="bar-txt-white">{{t.back}}</text></div>
+      <div class="bottom-bar bar-dark" onclick="setGameState('SETTINGS')">
+        <text class="bar-txt-white">{{t.back}}</text>
+      </div>
     </div>
 
     <div if="{{showDonate}}" class="donate-overlay" onclick="closeDonate">
       <image src="/common/donate.png" class="donate-img"></image>
       <text class="donate-hint">{{t.tapClose}}</text>
     </div>
+
     <div if="{{modal.visible}}" class="modal-overlay">
       <div class="modal-box">
         <text class="modal-title">{{modal.title}}</text>
         <text class="modal-msg">{{modal.message}}</text>
-        <div class="modal-btn" onclick="closeModal"><text class="modal-btn-txt">{{t.confirm}}</text></div>
+        <div class="modal-btn" onclick="closeModal">
+          <text class="modal-btn-txt">{{t.confirm}}</text>
+        </div>
       </div>
     </div>
+    
+    <div if="{{showOfflineModal}}" class="modal-overlay">
+      <div class="offline-modal-box">
+        <text class="offline-title">{{t.welcome || 'Welcome Back'}}</text>
+        <text class="offline-subtitle">{{t.offlineIncome || 'Offline Earnings'}}</text>
+        
+        <div class="offline-value-box">
+           <text class="offline-val">+{{formatPrice(offlineIncomeValue)}}</text>
+        </div>
+
+        <div class="offline-btn" onclick="claimOfflineGold">
+          <text class="offline-btn-txt">{{t.collect || 'Collect'}}</text>
+        </div>
+      </div>
+    </div>
+
   </div>
 </template>
 
 <style>
-  /* === Base === */
+  /* === 全域設置 === */
   .container { background-color: #000000; flex-direction: column; }
   .screen-full { width: 100%; height: 100%; flex-direction: column; }
   .scroll-list { flex: 1; padding: 10px 15px; flex-direction: column; }
+  
   .loading-screen { width: 100%; height: 100%; justify-content: center; align-items: center; background-color: #000; }
   .loading-txt { color: #FFD700; font-size: 24px; }
 
-  /* === Playing === */
-  .header-main { padding: 15px 0 5px; flex-direction: column; align-items: center; height: 80px; }
-  .gold-val { color: #FFD700; font-size: 36px; font-weight: bold; }
-  .stats-row { flex-direction: row; margin-top: 5px; }
+  /* === 主畫面 === */
+  .header-main { padding: 10px 0 0; flex-direction: column; align-items: center; height: 75px; }
+  .gold-val { color: #FFD700; font-size: 40px; font-weight: bold; }
+  .stats-row { flex-direction: row; margin-top: 2px; }
   .pps-val { color: #00BFFF; font-size: 14px; margin-right: 8px; }
   .rebirth-val { color: #BA55D3; font-size: 14px; }
+
   .mine-area { flex: 1; justify-content: center; align-items: center; flex-direction: column; }
   .static-pop { color: #FFFFFF; font-size: 32px; font-weight: bold; height: 40px; margin-bottom: 5px; opacity: 0; transform: scale(0.8); }
   .pop-active { opacity: 1; transform: scale(1.2); }
-  .css-ore { width: 180px; height: 180px; background-color: #FFD700; border: 6px solid #B8860B; border-radius: 90px; justify-content: center; align-items: center; position: relative; }
-  .ore-highlight { position: absolute; top: 18px; left: 35px; width: 45px; height: 22px; border-radius: 20px; background-color: rgba(255, 255, 255, 0.4); }
-  .ore-hit { width: 170px; height: 170px; border-width: 8px; }
+
+  .css-ore { width: 200px; height: 200px; background-color: #FFD700; border: 6px solid #B8860B; border-radius: 100px; justify-content: center; align-items: center; position: relative; }
+  .ore-highlight { position: absolute; top: 20px; left: 40px; width: 50px; height: 25px; border-radius: 20px; background-color: rgba(255, 255, 255, 0.4); }
+  .ore-hit { width: 190px; height: 190px; border-width: 8px; }
+
   .rare-ore-box { position: absolute; width: 40px; height: 40px; justify-content: center; align-items: center; animation-name: pulse; animation-duration: 1.5s; animation-iteration-count: infinite; }
-  .css-square-gem { width: 36px; height: 36px; background-color: #00BFFF; border: 3px solid #FFFFFF; border-radius: 6px; }
+  .css-square-gem { width: 42px; height: 42px; background-color: #00BFFF; border: 4px solid #FFFFFF; border-radius: 6px; justify-content: center; align-items: center; box-shadow: 0px 0px 10px #00BFFF; }
   .gem-shine-bar { width: 20px; height: 6px; background-color: rgba(255, 255, 255, 0.7); border-radius: 3px; margin-right: 10px; margin-bottom: 10px; }
-  .footer-area { padding: 0 15px 20px; flex-direction: column; justify-content: flex-end; }
-  .rebirth-bar { width: 100%; height: 50px; border-radius: 12px; margin-bottom: 12px; flex-direction: row; justify-content: space-between; align-items: center; padding: 0 15px; }
+
+  .footer-area { padding: 5px 15px 15px; flex-direction: column; }
+  
+  /* 重生按鈕 */
+  .rebirth-bar { width: 100%; height: 50px; border-radius: 10px; margin-bottom: 8px; flex-direction: row; justify-content: space-between; align-items: center; padding: 0 15px; }
   .rebirth-locked { background-color: #222; border: 1px solid #333; }
-  .rebirth-ready { background-color: #4B0082; border: 1px solid #BA55D3; }
+  .rebirth-ready { 
+    background-color: #4B0082; 
+    border: 2px solid #BA55D3; 
+    animation-name: glowPulse; 
+    animation-duration: 1.5s; 
+    animation-iteration-count: infinite; 
+  }
   .rebirth-txt-main { color: #FFF; font-size: 16px; font-weight: bold; }
-  .rebirth-cost-main { color: #AAA; font-size: 12px; }
-  .rebirth-arrow { color: #FFD700; font-size: 16px; }
-  .nav-row { flex-direction: row; justify-content: space-between; gap: 10px; }
-  .nav-btn { height: 50px; flex: 1; border-radius: 25px; justify-content: center; align-items: center; }
+  .rebirth-cost-main { color: #AAA; font-size: 14px; }
+
+  .nav-row { flex-direction: row; justify-content: space-between; }
+  .nav-btn { height: 50px; flex: 1; border-radius: 25px; justify-content: center; align-items: center; margin: 0 4px; }
   .btn-gold { background-color: #FFD700; }
   .btn-dark { background-color: #222; border: 1px solid #444; }
   .btn-txt-dark { color: #000; font-size: 18px; font-weight: bold; }
   .btn-txt-light { color: #BBB; font-size: 18px; }
 
-  /* === Shop === */
+  /* === 商店與分頁 === */
   .shop-bg { background-color: #080808; }
-  .sub-header { padding: 10px 20px; border-bottom: 1px solid #222; flex-direction: row; justify-content: space-between; align-items: center; height: 60px; }
+  .sub-header { padding: 10px 20px; border-bottom: 1px solid #222; flex-direction: row; justify-content: space-between; align-items: center; }
   .sub-title { color: #FFF; font-size: 20px; font-weight: bold; }
-  .sub-money { color: #FFD700; font-size: 16px; font-weight: bold; }
+  .sub-money { color: #FFD700; font-size: 14px; }
   .sub-money-r { color: #BA55D3; font-size: 12px; font-weight: bold; margin-top: 2px; }
-  .shop-tabs { flex-direction: row; padding: 0 10px; height: 45px; }
-  .tab-btn { flex: 1; justify-content: center; align-items: center; border-bottom-width: 2px; border-bottom-color: #222; }
-  .tab-active { border-bottom-color: #FFD700; }
-  .tab-txt { color: #666; font-size: 16px; }
+    
+  .shop-tabs { flex-direction: row; padding: 10px 15px 0; }
+  .tab-btn { flex: 1; height: 40px; justify-content: center; align-items: center; background-color: #111; border-bottom-width: 2px; border-bottom-color: #333; }
+  .tab-active { background-color: #222; border-bottom-color: #FFD700; }
+  .tab-txt { color: #888; font-size: 16px; }
   .txt-active { color: #FFD700; font-weight: bold; }
-  .txt-active-purple { color: #BA55D3; font-weight: bold; }
-  .pagination-bar { flex-direction: row; justify-content: center; align-items: center; height: 40px; background-color: #111; margin-bottom: 5px; }
-  .page-btn { width: 60px; justify-content: center; align-items: center; height: 100%; }
-  .page-btn-txt { color: #FFF; font-size: 20px; }
-  .page-info { color: #888; font-size: 14px; }
+
+  .pagination-bar { flex-direction: row; justify-content: center; align-items: center; padding: 5px 0; background-color: #111; border-bottom: 1px solid #222; }
+  .page-btn { width: 42px; height: 24px; background-color: #333; border-radius: 18px; justify-content: center; align-items: center; margin: 0 15px; }
+  .page-btn-txt { color: #FFF; font-size: 20px; font-weight: bold; }
+  .page-info { color: #AAA; font-size: 16px; }
+
   .shop-item { width: 100%; background-color: #121212; border-radius: 12px; padding: 10px; margin-bottom: 8px; flex-direction: row; align-items: center; border: 1px solid #262626; }
   .item-info { flex: 1; flex-direction: column; justify-content: center; }
   .item-name { color: #FFF; font-size: 14px; font-weight: bold; }
   .item-owned { color: #666; font-size: 10px; margin-top: 4px; }
-  .item-desc-purple { color: #D8BFD8; font-size: 10px; margin-top: 4px; }
   
-  .buy-btn { min-width: 80px; height: 45px; border-radius: 8px; justify-content: center; align-items: center; padding: 0 5px; flex-direction: column; }
+  .buy-btn { width: 85px; height: 50px; border-radius: 10px; flex-direction: column; justify-content: center; align-items: center; }
   .can-buy { background-color: #FFD700; }
   .no-buy { background-color: #333; }
   .buy-price { color: #000; font-size: 13px; font-weight: bold; }
-  .buy-label { color: #000; font-size: 10px; margin-top: 2px; }
+  .buy-label { color: #000; font-size: 10px; }
+
+  /* 重生商城專屬 */
+  .txt-active-purple { color: #BA55D3; font-weight: bold; }
   .btn-purple { background-color: #8A2BE2; }
   .shop-item-purple { border: 1px solid #BA55D3; }
+  .item-desc-purple { color: #D8BFD8; font-size: 10px; margin-top: 4px; }
   .buy-price-white { color: #FFFFFF; font-size: 13px; font-weight: bold; }
 
-  /* === Settings & Utils === */
+  /* === 成就卡片 === */
+  .new-ach-card { width: 100%; padding: 15px; margin-bottom: 10px; border-radius: 12px; flex-direction: row; align-items: center; }
+  .ach-gold { background-color: #2e2600; border: 1px solid #FFD700; }
+  .ach-gray { background-color: #111; border: 1px solid #333; }
+  .ach-icon-box { width: 40px; justify-content: center; align-items: center; margin-right: 10px; }
+  .ach-icon { font-size: 24px; color: #FFF; }
+  .ach-text-box { flex: 1; flex-direction: column; }
+  .ach-name-new { color: #FFF; font-size: 16px; font-weight: bold; }
+  .ach-status { color: #AAA; font-size: 10px; }
+
+  /* === 設置 === */
   .settings-bg { background-color: #050505; }
+  .ver-txt { color: #444; font-size: 12px; }
   .opt-card { width: 100%; padding: 15px; background-color: #111; border-radius: 10px; margin-bottom: 10px; flex-direction: row; justify-content: space-between; align-items: center; border: 1px solid #222; }
   .opt-label { color: #DDD; font-size: 16px; }
   .opt-state { color: #00BFFF; font-size: 16px; }
-  
-  /* 金色成就卡片樣式 */
-  .ach-card-gold { background-color: #1a1a00; border: 1px solid #FFD700; }
-  .opt-label-gold { color: #FFD700; font-size: 16px; font-weight: bold; }
-  .opt-state-gold { color: #FFD700; font-size: 16px; font-weight: bold; }
-
   .danger-card { background-color: #1a0505; border-color: #400; }
   .opt-label-red { color: #F55; font-size: 16px; }
   .opt-state-red { color: #A44; }
+
+  /* === 存檔槽樣式 === */
   .slot-active { border-color: #FFD700; background-color: #1a1a00; }
   .slot-desc { color: #888; font-size: 12px; margin-top: 4px; }
-  .new-ach-card { width: 100%; padding: 15px; margin-bottom: 10px; border-radius: 12px; flex-direction: row; align-items: center; justify-content: space-between; }
-  .ach-gold { background-color: #1a1a05; border: 1px solid #FFD700; }
-  .ach-gray { background-color: #111; border: 1px solid #333; }
-  .ach-icon-box { width: 40px; justify-content: center; align-items: center; margin-right: 10px; }
-  .ach-icon { font-size: 24px; color: #FFD700; }
-  .ach-text-box { flex: 1; flex-direction: column; }
-  .ach-name-new { font-size: 16px; font-weight: bold; }
-  .ach-status { color: #AAA; font-size: 10px; }
-  
+  .slot-date { color: #555; font-size: 10px; margin-top: 2px; }
+
   .donate-overlay { position: absolute; left: 0; top: 0; width: 100%; height: 100%; background-color: #000000; justify-content: center; align-items: center; flex-direction: column; z-index: 999; }
   .donate-img { width: 336px; height: 336px; object-fit: contain; }
   .donate-hint { color: #888; font-size: 14px; margin-top: 15px; }
-  
+
   .modal-overlay { position: absolute; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9); justify-content: center; align-items: center; flex-direction: column; }
   .modal-box { width: 85%; background-color: #1A1A1A; border: 2px solid #FFD700; border-radius: 15px; padding: 20px; flex-direction: column; align-items: center; }
   .modal-title { color: #FFD700; font-size: 28px; font-weight: bold; margin-bottom: 10px; text-align: center; }
@@ -319,8 +378,45 @@
   .bar-dark { background-color: #1A1A1A; border-top: 1px solid #333; }
   .bar-txt { color: #000; font-size: 18px; font-weight: bold; }
   .bar-txt-white { color: #FFF; font-size: 18px; }
+  
+  /* === 離線收益 UI (紫色) === */
+  .offline-modal-box {
+    width: 85%;
+    background-color: #111; 
+    border: 3px solid #9932CC; 
+    border-radius: 20px;
+    padding: 30px 20px;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0px 0px 30px rgba(153, 50, 204, 0.4);
+  }
+  .offline-title { color: #E6E6FA; font-size: 32px; font-weight: bold; margin-bottom: 5px; }
+  .offline-subtitle { color: #AAA; font-size: 16px; margin-bottom: 25px; }
+  .offline-value-box { margin-bottom: 30px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+  .offline-val { color: #FFD700; font-size: 48px; font-weight: bold; text-shadow: 0px 0px 10px #B8860B; }
+  .offline-btn {
+    width: 100%; height: 60px;
+    background-color: #8A2BE2;
+    border-radius: 12px;
+    justify-content: center; align-items: center;
+    border: 1px solid #BA55D3;
+    animation-name: glowPulse;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+  }
+  .offline-btn-txt { color: #FFF; font-size: 24px; font-weight: bold; }
 
-  @keyframes pulse { 0% { transform: scale(0.9); opacity: 0.8; } 50% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(0.9); opacity: 0.8; } }
+  @keyframes pulse { 
+    0% { transform: scale(0.9); opacity: 0.8; } 
+    50% { transform: scale(1.1); opacity: 1; } 
+    100% { transform: scale(0.9); opacity: 0.8; } 
+  }
+  
+  @keyframes glowPulse {
+    0% { opacity: 0.9; }
+    50% { opacity: 1.0; box-shadow: 0px 0px 15px #BA55D3; }
+    100% { opacity: 0.9; }
+  }
 </style>
 
 <script>
@@ -331,38 +427,48 @@ import brightness from '@system.brightness'
 
 const I18N = {
   'zh-CN': {
-    pps: '秒产', rebirth: '重生', equipShop: '设备采购',
+    pps: '秒产', rebirth: '重生', req: '花费', // 修復翻譯
+    equipShop: '设备采购',
     auto: '自动', manual: '手动', shop: '商店', settings: '设置',
     sysSettings: '系统设置', achTitle: '成就列表', deleteSave: '删除存档',
     confirm: '好', reset: '重置', back: '返回', exit: '退出', buy: '购买',
-    welcomeBack: '欢迎回来', offlineTime: '离线收益',
-    langLabel: '语言 / Language', hideRebirthLabel: '隐藏重生按钮', on: '开启', off: '关闭',
-    vibration: '触感震动', screenOn: '屏幕常亮', prefs: '偏好选项',
-    saveMan: '存档管理', slot: '存档', empty: '空', load: '读取', current: '当前',
-    msgLoadOk: '存档读取成功', achUnlocked: '已达成', achLocked: '未解锁',
-    tapEvolve: '点击进化', msgRebirthTitle: '重生成功!', msgRebirthContent: '效率翻倍 (x2)',
-    msgUnlocked: '成就已解锁!', msgResetDone: '重置完成', msgBuyOk: '购买成功',
+    bonus: '获得额外奖励', welcome: '欢迎回来', offlineIncome: '离线收益',
+    vibration: '触感震动', screenOn: '屏幕常亮', on: '开启', off: '关闭', owned: '持有',
     donate: '赞助开发者', tapClose: '点击任意处关闭',
-    store_rebirth: '重生商城', owned: '持有',
-    
-    // Items
+    hideRebirthLabel: '隐藏重生按钮',
+    prefs: '偏好选项', saveMan: '存档管理',
+    slot: '存档', empty: '空', load: '读取', current: '当前',
+    msgLoadOk: '存档读取成功',
+    achUnlocked: '已达成', achLocked: '未解锁',
+    tapEvolve: '点击进化', version: 'release:v1.0.0', langLabel: '语言 / Language',
+    buildVer: '5.2',
+    msgRebirthTitle: '重生成功!', msgRebirthContent: '效率翻倍 (x2)',
+    msgRich: '一夜暴富!', msgEvolved: '进化完成', msgUnlocked: '全部已解锁', msgResetDone: '重置完成',
+    msgBuyOk: '购买成功',
+    collect: '领取奖励',
+
+    store_rebirth: '重生商城',
     item_soul: '灵魂碎片', desc_soul: '全局收益 +10%',
     item_essence: '虚空精华', desc_essence: '全局收益 +50%',
     item_crown: '永恒王冠', desc_crown: '全局收益 +100%',
+
     item_pick: '生锈镐头', item_bird: '金丝雀', item_drill: '蒸汽钻头', item_miner: '初级矿工',
     item_cart: '矿车队', item_excavator: '挖掘机', item_tnt: '炸药专家', item_laser: '雷射钻井',
     item_quantum: '量子核心', item_nano: '纳米机器人', item_ai: 'AI 矿工', item_fusion: '冷核聚变',
     item_hole: '黑洞开采', item_dimension: '维度撕裂者',
     item_antimatter: '反物质泵', item_galaxy: '指尖星系', item_time: '时间膨胀机', item_universe: '掌中宇宙',
+    item_supernova: '超新星爆发', item_black_prism: '黑光棱镜',
     item_god_hand: '创世之手', item_creation: '大爆炸引擎',
-    item_supernova: '超新星爆发', item_black_prism: '黑光棱镜', item_star_forge: '恒星锻造厂', item_logic_gate: '因果律逻辑门',
-    item_dyson: '戴森球矩阵', item_darkmatter: '暗能量收割', item_spacetime_tear: '时空裂缝发电机', item_void_engine: '虚空引擎',
-    item_reality: '现实修改器', item_multiverse: '多重宇宙钻机', item_reset_button: '宇宙重置按钮', item_observer: '高维观察者',
-    item_timeline: '时间线建筑师', item_void: '虚空虹吸', item_code: '游戏源代码', item_infinite: '无限之点',
-    item_string: '弦理论编织机', item_entropy: '熵增逆转器', item_akashic: '阿卡西记录', item_bigcrunch: '大挤压生成器',
-    item_consciousness: '群体意识网', item_simulation: '世界模拟器', item_dimension_x: '第十一维度', item_omniverse: '全能宇宙核心',
+    item_star_forge: '恒星锻造厂', item_logic_gate: '因果律逻辑门',
+    item_dyson: '戴森球矩阵', item_darkmatter: '暗能量收割', 
+    item_spacetime_tear: '时空裂缝发电机', item_void_engine: '虚空引擎',
+    item_dimension_x: '第十一维度', item_omniverse: '全能宇宙核心', 
     item_creator: '造物主之笔', item_end: '终焉之刻',
-    
+
+    item_void_pickaxe: '虚空镐', item_star_eater: '吞星者',
+    item_existence_eraser: '存在抹除', item_reality_anchor: '现实锚点',
+    item_true_infinity: '真·无限', item_the_author: '作者本人',
+
     ach_warmup: '手指热身 (100点)', ach_click_500: '手指过热 (500点)', ach_click_5k: '鼠标破坏者 (5k点)',
     ach_gem_5: '宝石猎人 (5颗)', ach_gem_20: '宝石大亨 (20颗)',
     ach_first: '第一桶金 (10k)', ach_gold_1m: '百万富翁 (1M)', ach_gold_1b: '矿业大亨 (1B)', ach_trillion: '兆万富翁 (1T)',
@@ -370,38 +476,48 @@ const I18N = {
     ach_traveler: '时空旅人 (1重生)', ach_rebirth_5: '轮回大师 (5重生)'
   },
   'zh-TW': {
-    pps: '秒產', rebirth: '重生', equipShop: '設備採購',
+    pps: '秒產', rebirth: '重生', req: '花費',
+    equipShop: '設備採購',
     auto: '自動', manual: '手動', shop: '商店', settings: '設置',
     sysSettings: '系統設置', achTitle: '成就列表', deleteSave: '刪除存檔',
     confirm: '好', reset: '重置', back: '返回', exit: '退出', buy: '購買',
-    welcomeBack: '歡迎回來', offlineTime: '離線收益',
-    langLabel: '語言 / Language', hideRebirthLabel: '隱藏重生按鈕', on: '開啟', off: '關閉',
-    vibration: '觸感震動', screenOn: '螢幕常亮', prefs: '偏好選項',
-    saveMan: '存檔管理', slot: '存檔', empty: '空', load: '讀取', current: '當前',
-    msgLoadOk: '存檔讀取成功', achUnlocked: '已達成', achLocked: '未解鎖',
-    tapEvolve: '點擊進化', msgRebirthTitle: '重生成功!', msgRebirthContent: '效率翻倍 (x2)',
-    msgUnlocked: '成就已解鎖!', msgResetDone: '重置完成', msgBuyOk: '購買成功',
+    bonus: '獲得額外獎勵', welcome: '歡迎回來', offlineIncome: '離線收益',
+    vibration: '觸感震動', screenOn: '螢幕常亮', on: '開啟', off: '關閉', owned: '持有',
     donate: '贊助開發者', tapClose: '點擊任意處關閉',
-    store_rebirth: '重生商城', owned: '持有',
-    
-    // Items
+    hideRebirthLabel: '隱藏重生按鈕',
+    prefs: '偏好選項', saveMan: '存檔管理',
+    slot: '存檔', empty: '空', load: '讀取', current: '當前',
+    msgLoadOk: '存檔讀取成功',
+    achUnlocked: '已達成', achLocked: '未解鎖',
+    tapEvolve: '點擊進化', version: 'release:v1.0.0', langLabel: '語言 / Language',
+    buildVer: '5.2',
+    msgRebirthTitle: '重生成功!', msgRebirthContent: '效率翻倍 (x2)',
+    msgRich: '一夜暴富!', msgEvolved: '進化完成', msgUnlocked: '全部已解鎖', msgResetDone: '重置完成',
+    msgBuyOk: '購買成功',
+    collect: '領取獎勵',
+
+    store_rebirth: '重生商城',
     item_soul: '靈魂碎片', desc_soul: '全局收益 +10%',
     item_essence: '虛空精華', desc_essence: '全局收益 +50%',
     item_crown: '永恆王冠', desc_crown: '全局收益 +100%',
+
     item_pick: '生鏽鎬頭', item_bird: '金絲雀', item_drill: '蒸汽鑽頭', item_miner: '初級礦工',
     item_cart: '礦車隊', item_excavator: '挖掘機', item_tnt: '炸藥專家', item_laser: '雷射鑽井',
     item_quantum: '量子核心', item_nano: '奈米機器人', item_ai: 'AI 礦工', item_fusion: '冷核聚變',
     item_hole: '黑洞開採', item_dimension: '維度撕裂者',
     item_antimatter: '反物質泵', item_galaxy: '指尖星系', item_time: '時間膨脹機', item_universe: '掌中宇宙',
+    item_supernova: '超新星爆發', item_black_prism: '黑光棱鏡',
     item_god_hand: '創世之手', item_creation: '大爆炸引擎',
-    item_supernova: '超新星爆發', item_black_prism: '黑光稜鏡', item_star_forge: '恆星鍛造廠', item_logic_gate: '因果律邏輯門',
-    item_dyson: '戴森球矩陣', item_darkmatter: '暗能量收割', item_spacetime_tear: '時空裂縫發電機', item_void_engine: '虛空引擎',
-    item_reality: '現實修改器', item_multiverse: '多重宇宙鑽機', item_reset_button: '宇宙重置按鈕', item_observer: '高維觀察者',
-    item_timeline: '時間線建築師', item_void: '虛空虹吸', item_code: '遊戲原始碼', item_infinite: '無限之點',
-    item_string: '弦理論編織機', item_entropy: '熵增逆轉器', item_akashic: '阿卡西記錄', item_bigcrunch: '大擠壓生成器',
-    item_consciousness: '群體意識網', item_simulation: '世界模擬器', item_dimension_x: '第十一維度', item_omniverse: '全能宇宙核心',
+    item_star_forge: '恆星鍛造廠', item_logic_gate: '因果律邏輯門',
+    item_dyson: '戴森球矩陣', item_darkmatter: '暗能量收割', 
+    item_spacetime_tear: '時空裂縫發電機', item_void_engine: '虛空引擎',
+    item_dimension_x: '第十一維度', item_omniverse: '全能宇宙核心', 
     item_creator: '造物主之筆', item_end: '終焉之刻',
-    
+
+    item_void_pickaxe: '虛空鎬', item_star_eater: '吞星者',
+    item_existence_eraser: '存在抹除', item_reality_anchor: '現實錨點',
+    item_true_infinity: '真·無限', item_the_author: '作者本人',
+
     ach_warmup: '手指熱身 (100點)', ach_click_500: '手指過熱 (500點)', ach_click_5k: '滑鼠破壞者 (5k點)',
     ach_gem_5: '寶石獵人 (5顆)', ach_gem_20: '寶石大亨 (20顆)',
     ach_first: '第一桶金 (10k)', ach_gold_1m: '百萬富翁 (1M)', ach_gold_1b: '礦業大亨 (1B)', ach_trillion: '兆萬富翁 (1T)',
@@ -412,23 +528,52 @@ const I18N = {
 
 export default {
   private: {
-    dataLoaded: false, language: 'zh-CN', t: {},
+    dataLoaded: false,
+    language: 'zh-CN',
+    t: {},
     modal: { visible: false, title: '', message: '' },
+    
     gameState: 'PLAYING',
     
-    shopTab: 'click', shopPage: 0, itemsPerPage: 4, maxPage: 0, visibleItems: [], 
-    currentSaveSlot: 0, slotsInfo: [null, null, null],
+    shopTab: 'click',
+    shopPage: 0,
+    itemsPerPage: 5,
+    maxPage: 0,
+    visibleItems: [],
 
-    totalGold: 0, gps: 0, clickPower: 1, rebirthCount: 0, rebirthReq: 10000,
-    isClicking: false, showClickFeedback: false, clickFeedbackTimer: null,
-    goldenOreVisible: false, goldenOreX: 50, goldenOreY: 50, goldenOreTimer: null, goldenOreClickCount: 0,
-
-    hideRebirthBtn: false, resetClickCount: 10, totalClicks: 0,
-    unlockedAchievements: 0,
     showDonate: false,
-    
-    vibrationEnabled: true, keepScreenOn: true, // [Persistence]
 
+    currentSaveSlot: 0,
+    slotsInfo: [null, null, null],
+
+    totalGold: 0,
+    gps: 0,
+    clickPower: 1,
+    rebirthCount: 0,
+    rebirthReq: 10000,
+    totalClicks: 0, 
+    
+    hideRebirthBtn: false,
+    vibrationEnabled: true,
+    keepScreenOn: false,
+    
+    showOfflineModal: false,
+    offlineIncomeValue: 0,
+    lastSaveTime: 0,
+
+    isClicking: false,
+    showClickFeedback: false,
+    clickFeedbackTimer: null,
+    
+    goldenOreVisible: false,
+    goldenOreX: 0,
+    goldenOreY: 0,
+    goldenOreTimer: null,
+    goldenOreClickCount: 0,
+    
+    resetClickCount: 10,
+    unlockedAchievements: 0,
+    
     achievements: [
       { id: 'c_100', key: 'ach_warmup', name: '', condition: (d) => d.totalClicks >= 100, unlocked: false },
       { id: 'c_500', key: 'ach_click_500', name: '', condition: (d) => d.totalClicks >= 500, unlocked: false },
@@ -457,44 +602,37 @@ export default {
       { key: 'item_laser', name: "", basePrice: 200000, price: 200000, owned: 0, power: 1500, type: 'gps' },
       { key: 'item_quantum', name: "", basePrice: 1000000, price: 1000000, owned: 0, power: 8000, type: 'click' },
       { key: 'item_nano', name: "", basePrice: 50000000, price: 50000000, owned: 0, power: 300000, type: 'gps' },
-      { key: 'item_ai', name: "", basePrice: 250000000, price: 250000000, owned: 0, power: 1200000, type: 'click' },
-      { key: 'item_fusion', name: "", basePrice: 1000000000, price: 1000000000, owned: 0, power: 5000000, type: 'gps' },
-      { key: 'item_hole', name: "", basePrice: 5000000000, price: 5000000000, owned: 0, power: 20000000, type: 'click' },
-      { key: 'item_dimension', name: "", basePrice: 20000000000, price: 20000000000, owned: 0, power: 80000000, type: 'gps' },
-      { key: 'item_antimatter', name: "", basePrice: 100000000000, price: 100000000000, owned: 0, power: 300000000, type: 'click' },
-      { key: 'item_galaxy', name: "", basePrice: 500000000000, price: 500000000000, owned: 0, power: 1500000000, type: 'gps' },
-      { key: 'item_time', name: "", basePrice: 2000000000000, price: 2000000000000, owned: 0, power: 8000000000, type: 'click' },
-      { key: 'item_universe', name: "", basePrice: 10000000000000, price: 10000000000000, owned: 0, power: 50000000000, type: 'gps' },
-      { key: 'item_supernova', name: "", basePrice: 50000000000000, price: 50000000000000, owned: 0, power: 200000000000, type: 'click' },
-      { key: 'item_black_prism', name: "", basePrice: 200000000000000, price: 200000000000000, owned: 0, power: 1000000000000, type: 'gps' },
-      { key: 'item_god_hand', name: "", basePrice: 1000000000000000, price: 1000000000000000, owned: 0, power: 5000000000000, type: 'click' },
-      { key: 'item_creation', name: "", basePrice: 5000000000000000, price: 5000000000000000, owned: 0, power: 25000000000000, type: 'gps' },
-      { key: 'item_star_forge', name: "", basePrice: 20000000000000000, price: 20000000000000000, owned: 0, power: 100000000000000, type: 'click' },
-      { key: 'item_logic_gate', name: "", basePrice: 100000000000000000, price: 100000000000000000, owned: 0, power: 500000000000000, type: 'gps' },
-      { key: 'item_dyson', name: "", basePrice: 500000000000000000, price: 500000000000000000, owned: 0, power: 2000000000000000, type: 'click' },
-      { key: 'item_darkmatter', name: "", basePrice: 2500000000000000000, price: 2500000000000000000, owned: 0, power: 12000000000000000, type: 'gps' },
-      { key: 'item_spacetime_tear', name: "", basePrice: 10000000000000000000, price: 10000000000000000000, owned: 0, power: 50000000000000000, type: 'click' },
-      { key: 'item_void_engine', name: "", basePrice: 50000000000000000000, price: 50000000000000000000, owned: 0, power: 250000000000000000, type: 'gps' },
-      { key: 'item_reality', name: "", basePrice: 200000000000000000000, price: 200000000000000000000, owned: 0, power: 1000000000000000000, type: 'click' },
-      { key: 'item_multiverse', name: "", basePrice: 1000000000000000000000, price: 1000000000000000000000, owned: 0, power: 5000000000000000000, type: 'gps' },
-      { key: 'item_reset_button', name: "", basePrice: 5000000000000000000000, price: 5000000000000000000000, owned: 0, power: 25000000000000000000, type: 'click' },
-      { key: 'item_observer', name: "", basePrice: 25000000000000000000000, price: 25000000000000000000000, owned: 0, power: 120000000000000000000, type: 'gps' },
-      { key: 'item_timeline', name: "", basePrice: 100000000000000000000000, price: 100000000000000000000000, owned: 0, power: 500000000000000000000, type: 'click' },
-      { key: 'item_void', name: "", basePrice: 500000000000000000000000, price: 500000000000000000000000, owned: 0, power: 2500000000000000000000, type: 'gps' },
-      { key: 'item_code', name: "", basePrice: 2500000000000000000000000, price: 2500000000000000000000000, owned: 0, power: 12000000000000000000000, type: 'click' },
-      { key: 'item_infinite', name: "", basePrice: 10000000000000000000000000, price: 10000000000000000000000000, owned: 0, power: 50000000000000000000000, type: 'gps' },
-      { key: 'item_string', name: "", basePrice: 50000000000000000000000000, price: 50000000000000000000000000, owned: 0, power: 250000000000000000000000, type: 'click' },
-      { key: 'item_entropy', name: "", basePrice: 250000000000000000000000000, price: 250000000000000000000000000, owned: 0, power: 1200000000000000000000000, type: 'gps' },
-      { key: 'item_akashic', name: "", basePrice: 1000000000000000000000000000, price: 1000000000000000000000000000, owned: 0, power: 5000000000000000000000000, type: 'click' },
-      { key: 'item_bigcrunch', name: "", basePrice: 5000000000000000000000000000, price: 5000000000000000000000000000, owned: 0, power: 25000000000000000000000000, type: 'gps' },
-      { key: 'item_consciousness', name: "", basePrice: 25000000000000000000000000000, price: 25000000000000000000000000000, owned: 0, power: 120000000000000000000000000, type: 'click' },
-      { key: 'item_simulation', name: "", basePrice: 100000000000000000000000000000, price: 100000000000000000000000000000, owned: 0, power: 500000000000000000000000000, type: 'gps' },
+      { key: 'item_ai', name: "", basePrice: 250000000, price: 250000000, owned: 0, power: 2000000, type: 'click' },
+      { key: 'item_fusion', name: "", basePrice: 1000000000, price: 1000000000, owned: 0, power: 10000000, type: 'gps' },
+      { key: 'item_hole', name: "", basePrice: 5000000000, price: 5000000000, owned: 0, power: 50000000, type: 'click' },
+      { key: 'item_dimension', name: "", basePrice: 25000000000, price: 25000000000, owned: 0, power: 300000000, type: 'gps' },
+      { key: 'item_antimatter', name: "", basePrice: 100000000000, price: 100000000000, owned: 0, power: 1000000000, type: 'click' },
+      { key: 'item_galaxy', name: "", basePrice: 500000000000, price: 500000000000, owned: 0, power: 8000000000, type: 'gps' },
+      { key: 'item_time', name: "", basePrice: 2500000000000, price: 2500000000000, owned: 0, power: 50000000000, type: 'click' },
+      { key: 'item_universe', name: "", basePrice: 10000000000000, price: 10000000000000, owned: 0, power: 250000000000, type: 'gps' },
+      { key: 'item_supernova', name: "", basePrice: 50000000000000, price: 50000000000000, owned: 0, power: 1000000000000, type: 'click' },
+      { key: 'item_black_prism', name: "", basePrice: 250000000000000, price: 250000000000000, owned: 0, power: 10000000000000, type: 'gps' },
+      { key: 'item_god_hand', name: "", basePrice: 1000000000000000, price: 1000000000000000, owned: 0, power: 50000000000000, type: 'click' },
+      { key: 'item_creation', name: "", basePrice: 5000000000000000, price: 5000000000000000, owned: 0, power: 250000000000000, type: 'gps' },
+      { key: 'item_star_forge', name: "", basePrice: 20000000000000000, price: 20000000000000000, owned: 0, power: 1000000000000000, type: 'click' },
+      { key: 'item_logic_gate', name: "", basePrice: 100000000000000000, price: 100000000000000000, owned: 0, power: 5000000000000000, type: 'gps' },
+      { key: 'item_dyson', name: "", basePrice: 500000000000000000, price: 500000000000000000, owned: 0, power: 20000000000000000, type: 'click' },
+      { key: 'item_darkmatter', name: "", basePrice: 2500000000000000000, price: 2500000000000000000, owned: 0, power: 120000000000000000, type: 'gps' },
+      { key: 'item_spacetime_tear', name: "", basePrice: 10000000000000000000, price: 10000000000000000000, owned: 0, power: 500000000000000000, type: 'click' },
+      { key: 'item_void_engine', name: "", basePrice: 50000000000000000000, price: 50000000000000000000, owned: 0, power: 2500000000000000000, type: 'gps' },
       { key: 'item_dimension_x', name: "", basePrice: 500000000000000000000000000000, price: 500000000000000000000000000000, owned: 0, power: 2500000000000000000000000000, type: 'click' },
       { key: 'item_omniverse', name: "", basePrice: 2500000000000000000000000000000, price: 2500000000000000000000000000000, owned: 0, power: 12000000000000000000000000000, type: 'gps' },
       { key: 'item_creator', name: "", basePrice: 10000000000000000000000000000000, price: 10000000000000000000000000000000, owned: 0, power: 50000000000000000000000000000, type: 'click' },
-      { key: 'item_end', name: "", basePrice: 100000000000000000000000000000000, price: 100000000000000000000000000000000, owned: 0, power: 50000000000000000000000000000, type: 'gps' }
+      { key: 'item_end', name: "", basePrice: 100000000000000000000000000000000, price: 100000000000000000000000000000000, owned: 0, power: 50000000000000000000000000000, type: 'gps' },
+      
+      { key: 'item_void_pickaxe', name: "", basePrice: 500000000000000000000000000000000, price: 500000000000000000000000000000000, owned: 0, power: 2500000000000000000000000000000, type: 'click' },
+      { key: 'item_star_eater', name: "", basePrice: 2000000000000000000000000000000000, price: 2000000000000000000000000000000000, owned: 0, power: 10000000000000000000000000000000, type: 'gps' },
+      { key: 'item_existence_eraser', name: "", basePrice: 10000000000000000000000000000000000, price: 10000000000000000000000000000000000, owned: 0, power: 50000000000000000000000000000000, type: 'click' },
+      { key: 'item_reality_anchor', name: "", basePrice: 50000000000000000000000000000000000, price: 50000000000000000000000000000000000, owned: 0, power: 250000000000000000000000000000000, type: 'gps' },
+      { key: 'item_true_infinity', name: "", basePrice: 250000000000000000000000000000000000, price: 250000000000000000000000000000000000, owned: 0, power: 1200000000000000000000000000000000, type: 'click' },
+      { key: 'item_the_author', name: "", basePrice: 1000000000000000000000000000000000000, price: 1000000000000000000000000000000000000, owned: 0, power: 5000000000000000000000000000000000, type: 'gps' }
     ],
-    
+
     rebirthItems: [
       { key: 'item_soul', name: '', desc: '', basePrice: 1, price: 1, owned: 0, power: 0.1, type: 'rebirth_buff' },
       { key: 'item_essence', name: '', desc: '', basePrice: 5, price: 5, owned: 0, power: 0.5, type: 'rebirth_buff' },
@@ -503,285 +641,447 @@ export default {
   },
 
   onInit() {
-    this.t = I18N[this.language];
-    this.loadPrefs(); 
+    this.t = I18N[this.language] || I18N['zh-CN'];
+    
     this.updateItemNames();
+    this.upgradeList.forEach((item, idx) => { item.originalIndex = idx; });
     this.updateSlotsInfo();
+
     this.loadData();
     
     setInterval(() => {
       if (this.gameState === 'PLAYING') {
-        this.totalGold += this.gps / 10;
+        if (this.gps > 0) {
+          this.totalGold += (this.gps / 10);
+        }
+        
+        const now = Date.now();
+        
+        this.checkAchievements();
+        
+        // 這裡將 30000 改為 5000，每 5 秒自動存檔一次
+        if (now - this.lastSaveTime > 5000) {
+          this.saveData();
+          this.lastSaveTime = now;
+        }
       }
     }, 100);
-    
-    setInterval(() => {
-      if (this.gameState === 'PLAYING') {
-        this.checkAchievements();
-        this.saveData();
-      }
-    }, 5000);
 
     this.scheduleGoldenOre();
   },
+
+  // 增加這兩個生命週期函數，確保退出時存檔
+  onHide() {
+    this.saveData();
+  },
   
+  onDestroy() {
+    this.saveData();
+  },
+
+  loadData() {
+    storage.get({
+      key: 'mine_save_slot_' + this.currentSaveSlot,
+      success: (data) => {
+        if (data) {
+          try {
+            const d = JSON.parse(data);
+            
+            this.totalGold = d.g || 0;
+            this.rebirthCount = d.rc || 0;
+            this.rebirthReq = d.rr || 10000;
+            this.totalClicks = d.tc || 0;
+            this.goldenOreClickCount = d.gc || 0;
+
+            if (d.u && Array.isArray(d.u)) {
+              d.u.forEach((owned, i) => { 
+                if (this.upgradeList[i]) {
+                  this.upgradeList[i].owned = owned;
+                  let price = this.upgradeList[i].basePrice * Math.pow(1.15, owned);
+                  this.upgradeList[i].price = Math.ceil(price);
+                }
+              });
+            }
+            if (d.ri && Array.isArray(d.ri)) {
+              d.ri.forEach((owned, i) => {
+                 if (this.rebirthItems[i]) {
+                   this.rebirthItems[i].owned = owned;
+                   let price = this.rebirthItems[i].basePrice * Math.pow(1.5, owned);
+                   this.rebirthItems[i].price = Math.ceil(price);
+                 }
+              });
+            }
+            if (d.a && Array.isArray(d.a)) {
+              d.a.forEach((unlocked, i) => {
+                if (this.achievements[i]) this.achievements[i].unlocked = (unlocked === 1);
+              });
+            }
+
+            if (d.lang) {
+               this.language = d.lang;
+               this.t = I18N[this.language];
+               this.updateItemNames();
+            }
+            if (d.hr !== undefined) this.hideRebirthBtn = (d.hr === 1);
+            if (d.ve !== undefined) this.vibrationEnabled = (d.ve === 1);
+            if (d.ks !== undefined) {
+               this.keepScreenOn = (d.ks === 1);
+               try { brightness.setKeepScreenOn({ keepScreenOn: this.keepScreenOn }); } catch(e){}
+            }
+
+            this.recalculateStats();
+
+            if (d.t) {
+               const now = Date.now();
+               const secondsPassed = (now - d.t) / 1000;
+               if (secondsPassed > 60 && this.gps > 0) {
+                  const offlineEarned = Math.floor(secondsPassed * this.gps);
+                  if (offlineEarned > 0) {
+                     this.offlineIncomeValue = offlineEarned;
+                     this.showOfflineModal = true;
+                  }
+               }
+            }
+            
+            this.checkAchievements();
+            
+          } catch (e) {
+            console.error("Load failed", e);
+          }
+        }
+        this.dataLoaded = true;
+      },
+      fail: () => {
+        this.dataLoaded = true;
+      }
+    });
+  },
+
+  saveData() {
+    const dataToSave = {
+      g: this.totalGold,
+      rc: this.rebirthCount,
+      rr: this.rebirthReq,
+      tc: this.totalClicks,
+      gc: this.goldenOreClickCount,
+      u: this.upgradeList.map(i => i.owned),
+      ri: this.rebirthItems.map(i => i.owned),
+      a: this.achievements.map(a => a.unlocked ? 1 : 0),
+      
+      t: Date.now(),
+      lang: this.language,
+      hr: this.hideRebirthBtn ? 1 : 0,
+      ve: this.vibrationEnabled ? 1 : 0,
+      ks: this.keepScreenOn ? 1 : 0
+    };
+    
+    storage.set({
+      key: 'mine_save_slot_' + this.currentSaveSlot,
+      value: JSON.stringify(dataToSave)
+    });
+    this.updateSlotsInfo();
+  },
+
+  claimOfflineGold() {
+    this.totalGold += this.offlineIncomeValue;
+    this.showOfflineModal = false;
+    
+    if (this.vibrationEnabled) vibrator.vibrate({ mode: 'short' });
+    prompt.showToast({ message: `+ ${this.formatPrice(this.offlineIncomeValue)}` });
+    
+    this.offlineIncomeValue = 0;
+    this.saveData();
+  },
+
   updateItemNames() {
-    this.upgradeList.forEach(item => { item.name = this.t[item.key] || item.key; });
+    this.upgradeList.forEach(item => {
+      item.name = this.t[item.key] || item.key;
+    });
     this.rebirthItems.forEach(item => {
       item.name = this.t[item.key] || item.key;
       let descKey = 'desc_' + item.key.replace('item_', '');
       item.desc = this.t[descKey] || '';
     });
-    this.achievements.forEach(item => { item.name = this.t[item.key] || item.key; });
+    this.achievements.forEach(item => {
+      item.name = this.t[item.key] || item.key;
+    });
   },
 
   setGameState(state) {
     this.gameState = state;
-    if (state === 'SHOP') this.setShopTab(this.shopTab);
-  },
-
-  // === Preferences (Persistent) ===
-  loadPrefs() {
-    storage.get({
-      key: 'mine_v2_prefs',
-      success: (res) => {
-        if (res) {
-          try {
-            const p = JSON.parse(res);
-            if (p.lang) {
-               this.language = p.lang;
-               this.t = I18N[this.language];
-               this.updateItemNames();
-            }
-            if (p.hideRebirth !== undefined) this.hideRebirthBtn = p.hideRebirth;
-            if (p.vibration !== undefined) this.vibrationEnabled = p.vibration;
-            if (p.screenOn !== undefined) {
-                this.keepScreenOn = p.screenOn;
-                brightness.setKeepScreenOn({ keepScreenOn: this.keepScreenOn });
-            }
-          } catch(e){}
-        }
-      }
-    });
-  },
-  savePrefs() {
-    const prefs = { 
-        lang: this.language, 
-        hideRebirth: this.hideRebirthBtn,
-        vibration: this.vibrationEnabled,
-        screenOn: this.keepScreenOn
-    };
-    storage.set({ key: 'mine_v2_prefs', value: JSON.stringify(prefs) });
+    if (state === 'SHOP') {
+      this.setShopTab(this.shopTab);
+    }
   },
 
   toggleLanguage() {
     this.language = this.language === 'zh-CN' ? 'zh-TW' : 'zh-CN';
     this.t = I18N[this.language];
     this.updateItemNames();
-    this.savePrefs();
+    this.updateSlotsInfo();
+    this.saveData(); 
   },
-  toggleRebirthBtn() { 
-    this.hideRebirthBtn = !this.hideRebirthBtn; 
-    this.savePrefs();
+  toggleRebirthBtn() { this.hideRebirthBtn = !this.hideRebirthBtn; this.saveData(); },
+  toggleVibration() { this.vibrationEnabled = !this.vibrationEnabled; this.saveData(); },
+  toggleScreenKeep() { 
+      this.keepScreenOn = !this.keepScreenOn;
+      try { brightness.setKeepScreenOn({ keepScreenOn: this.keepScreenOn }); } catch(e){}
+      this.saveData();
   },
-  toggleVibration() {
-    this.vibrationEnabled = !this.vibrationEnabled;
-    this.savePrefs();
-  },
-  toggleScreenKeep() {
-    this.keepScreenOn = !this.keepScreenOn;
-    brightness.setKeepScreenOn({ keepScreenOn: this.keepScreenOn });
-    this.savePrefs();
-  },
-  openDonate() { this.showDonate = true; },
-  closeDonate() { this.showDonate = false; },
 
-  // === Shop Logic ===
   setShopTab(tab) {
-    this.shopTab = tab; this.shopPage = 0;
-    this.refreshVisibleItems();
+    this.shopTab = tab;
+    this.shopPage = 0;
+    let sourceList = [];
+    if (tab === 'click') {
+      sourceList = this.upgradeList.filter(i => i.type === 'click');
+    } else if (tab === 'gps') {
+      sourceList = this.upgradeList.filter(i => i.type === 'gps');
+    } else if (tab === 'rebirth') {
+      sourceList = this.rebirthItems;
+    }
+    this.maxPage = Math.floor((sourceList.length - 1) / this.itemsPerPage);
+    if (this.maxPage < 0) this.maxPage = 0;
+    this.updateVisibleItems(sourceList);
   },
-  refreshVisibleItems() {
-    let list = [];
-    if (this.shopTab === 'click') list = this.upgradeList.filter(i => i.type === 'click');
-    else if (this.shopTab === 'gps') list = this.upgradeList.filter(i => i.type === 'gps');
-    else if (this.shopTab === 'rebirth') list = this.rebirthItems;
-    
-    this.maxPage = Math.max(0, Math.ceil(list.length / this.itemsPerPage) - 1);
-    const start = this.shopPage * this.itemsPerPage;
-    this.visibleItems = list.slice(start, start + this.itemsPerPage);
-  },
+
   changePage(dir) {
     let newPage = this.shopPage + dir;
     if (newPage < 0 || newPage > this.maxPage) return;
     this.shopPage = newPage;
-    this.refreshVisibleItems();
-  },
-  buyItem(item) {
-    let realItem = item.type === 'rebirth_buff' ? this.rebirthItems.find(i => i.key === item.key) : this.upgradeList.find(i => i.key === item.key);
-    
-    if (realItem.type === 'rebirth_buff') {
-      if (this.rebirthCount >= realItem.price) {
-        this.rebirthCount -= realItem.price; realItem.owned++;
-        realItem.price = Math.ceil(realItem.price * 1.5);
-        this.recalculateStats(); this.saveData(); prompt.showToast({message: this.t.msgBuyOk});
-      }
-    } else {
-      if (this.totalGold >= realItem.price) {
-        this.totalGold -= realItem.price; realItem.owned++;
-        realItem.price = Math.ceil(realItem.basePrice * Math.pow(1.15, realItem.owned));
-        this.recalculateStats(); this.saveData(); prompt.showToast({message: this.t.msgBuyOk});
-      }
-    }
+    let sourceList = [];
+    if (this.shopTab === 'click') sourceList = this.upgradeList.filter(i => i.type === 'click');
+    else if (this.shopTab === 'gps') sourceList = this.upgradeList.filter(i => i.type === 'gps');
+    else if (this.shopTab === 'rebirth') sourceList = this.rebirthItems;
+    this.updateVisibleItems(sourceList);
   },
 
-  // === Game Logic ===
+  updateVisibleItems(list) {
+    const start = this.shopPage * this.itemsPerPage;
+    this.visibleItems = list.slice(start, start + this.itemsPerPage);
+  },
+
   formatPrice(num) {
-    if (num < 1000) return Math.floor(num).toString();
-    const units = ['k', 'M', 'B', 'T', 'aa', 'bb', 'cc', 'dd', 'ee', 'ff', 'gg', 'hh', 'ii', 'jj', 'kk', 'll', 'mm'];
+    if (num < 1000) return Math.floor(num);
+    const units = ['k', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp', 'Oc', 'No', 'Dc', 'Ud', 'Dd', 'Td', 'Qad', 'Qid', 'Sxd', 'Spd', 'Ocd', 'Nod', 'Vg', 'Uvg'];
     const exponent = Math.floor(Math.log10(num) / 3);
     const unitIndex = exponent - 1;
     if (unitIndex >= units.length) return 'INF';
-    return (num / Math.pow(1000, exponent)).toFixed(2) + units[unitIndex];
-  },
-  formatTime(seconds) {
-    if (seconds < 60) return Math.floor(seconds) + 's';
-    if (seconds < 3600) return Math.floor(seconds / 60) + 'm';
-    return Math.floor(seconds / 3600) + 'h';
-  },
-  handleManualClick() {
-    this.totalGold += this.clickPower; this.totalClicks++;
-    this.isClicking = true; this.showClickFeedback = true;
-    if (this.clickFeedbackTimer) clearTimeout(this.clickFeedbackTimer);
-    this.clickFeedbackTimer = setTimeout(() => { this.isClicking = false; this.showClickFeedback = false; }, 100);
-    if (this.vibrationEnabled) vibrator.vibrate({ mode: 'short' });
-  },
-  handleRebirth() {
-    if (this.totalGold >= this.rebirthReq) {
-      this.totalGold = 0; this.gps = 0; this.clickPower = 1;
-      this.upgradeList.forEach(item => { item.owned = 0; item.price = item.basePrice; });
-      this.rebirthCount++; this.rebirthReq *= 5;
-      this.recalculateStats(); this.saveData();
-      this.showModal(this.t.msgRebirthTitle, this.t.msgRebirthContent);
-    }
-  },
-  recalculateStats() {
-    let rawClick = 1; let rawGPS = 0;
-    this.upgradeList.forEach(item => {
-      if (item.type === 'click') rawClick += item.owned * item.power;
-      if (item.type === 'gps') rawGPS += item.owned * item.power;
-    });
-    let mult = 1 + (this.rebirthItems.reduce((acc, i) => acc + (i.owned * i.power), 0));
-    mult *= Math.pow(2, this.rebirthCount);
-    this.clickPower = rawClick * mult;
-    this.gps = rawGPS * mult;
-  },
-  checkAchievements() {
-    let unlock = false;
-    this.achievements.forEach(ach => {
-      if (!ach.unlocked && ach.condition(this)) { ach.unlocked = true; unlock = true; }
-    });
-    this.unlockedAchievements = this.achievements.filter(a => a.unlocked).length;
-    if (unlock) prompt.showToast({ message: this.t.msgUnlocked });
+    const val = num / Math.pow(1000, exponent);
+    return val.toFixed(2) + units[unitIndex];
   },
 
-  // === Rare Ore ===
-  scheduleGoldenOre() {
-    setTimeout(() => { this.spawnGoldenOre(); }, Math.random() * 20000 + 10000);
+  handleManualClick() {
+    this.totalGold += this.clickPower;
+    this.totalClicks++;
+    this.isClicking = true;
+    this.showClickFeedback = true;
+    
+    if (this.clickFeedbackTimer) clearTimeout(this.clickFeedbackTimer);
+    this.clickFeedbackTimer = setTimeout(() => {
+      this.isClicking = false;
+      this.showClickFeedback = false;
+    }, 100);
+
+    if (this.vibrationEnabled) vibrator.vibrate({ mode: 'short' });
   },
-  spawnGoldenOre() {
-    if (this.gameState === 'PLAYING') {
-      this.goldenOreX = Math.floor(Math.random() * 200) + 20;
-      this.goldenOreY = Math.floor(Math.random() * 300) + 80;
-      this.goldenOreVisible = true;
-      setTimeout(() => { this.goldenOreVisible = false; this.scheduleGoldenOre(); }, 6000);
-    } else {
-      this.scheduleGoldenOre();
+
+  buyItem(item) {
+    let targetItem = item;
+    if (typeof item === 'number') {
+       targetItem = this.upgradeList[item];
+    }
+    
+    if (targetItem.type === 'rebirth_buff') {
+      if (this.rebirthCount >= targetItem.price) {
+        this.rebirthCount -= targetItem.price;
+        targetItem.owned++;
+        targetItem.price = Math.ceil(targetItem.price * 1.5);
+        prompt.showToast({ message: this.t.msgBuyOk });
+        this.recalculateStats();
+        this.saveData();
+      } else {
+        prompt.showToast({ message: "重生点不足 / Not enough Rebirth Points" });
+      }
+      return;
+    }
+
+    if (this.totalGold >= targetItem.price) {
+      this.totalGold -= targetItem.price;
+      targetItem.owned++;
+      targetItem.price = Math.ceil(targetItem.basePrice * Math.pow(1.15, targetItem.owned));
+      prompt.showToast({ message: this.t.msgBuyOk });
+      this.recalculateStats();
+      this.checkAchievements();
     }
   },
+
+  handleRebirth() {
+    if (this.totalGold >= this.rebirthReq) {
+      this.totalGold = 0;
+      this.gps = 0;
+      this.clickPower = 1;
+      
+      this.upgradeList.forEach(item => {
+        item.owned = 0;
+        item.price = item.basePrice;
+      });
+      
+      this.rebirthCount++;
+      this.rebirthReq = this.rebirthReq * 5;
+      
+      this.recalculateStats();
+      this.saveData();
+      
+      this.showModal(this.t.msgRebirthTitle, this.t.msgRebirthContent);
+      this.checkAchievements();
+    }
+  },
+
+  recalculateStats() {
+    let rawClick = 1;
+    let rawGPS = 0;
+    
+    this.upgradeList.forEach(item => {
+      if (item.type === 'click') rawClick += (item.power * item.owned);
+      if (item.type === 'gps') rawGPS += (item.power * item.owned);
+    });
+
+    let shopMult = 1;
+    this.rebirthItems.forEach(item => {
+      shopMult += item.owned * item.power;
+    });
+
+    let baseRebirthMult = Math.pow(2, this.rebirthCount);
+    
+    let finalMult = baseRebirthMult * shopMult;
+    
+    this.clickPower = rawClick * finalMult;
+    this.gps = rawGPS * finalMult;
+  },
+
+  checkAchievements() {
+    let newlyUnlocked = 0;
+    this.achievements.forEach(ach => {
+      if (!ach.unlocked && ach.condition(this)) {
+        ach.unlocked = true;
+        newlyUnlocked++;
+      }
+    });
+    this.unlockedAchievements = this.achievements.filter(a => a.unlocked).length;
+    if (newlyUnlocked > 0) {
+      prompt.showToast({ message: `${this.t.msgUnlocked} (${newlyUnlocked})` });
+    }
+  },
+
+  scheduleGoldenOre() {
+    if (this.goldenOreTimer) clearTimeout(this.goldenOreTimer);
+    let delay = Math.random() * 30000 + 30000;
+    this.goldenOreTimer = setTimeout(() => {
+      this.spawnGoldenOre();
+    }, delay);
+  },
+
+  spawnGoldenOre() {
+    if (this.gameState !== 'PLAYING') {
+      this.scheduleGoldenOre();
+      return;
+    }
+    this.goldenOreX = Math.floor(Math.random() * 250) + 20;
+    this.goldenOreY = Math.floor(Math.random() * 400) + 100;
+    this.goldenOreVisible = true;
+    
+    setTimeout(() => {
+      if (this.goldenOreVisible) {
+        this.goldenOreVisible = false;
+        this.scheduleGoldenOre();
+      }
+    }, 10000);
+  },
+
   clickGoldenOre() {
+    if (!this.goldenOreVisible) return;
     this.goldenOreVisible = false;
-    let bonus = Math.max(100, this.gps * 60);
+    this.goldenOreClickCount++;
+    
+    let bonus = Math.max(this.gps * 60, this.clickPower * 100);
+    if (bonus < 100) bonus = 100;
+    
     this.totalGold += bonus;
-    prompt.showToast({ message: `Lucky! +${this.formatPrice(bonus)}` });
+    prompt.showToast({ message: `${this.t.bonus}: +${this.formatPrice(bonus)}` });
+    this.checkAchievements();
     this.scheduleGoldenOre();
   },
 
-  // === Save System ===
-  saveData() {
-    const data = {
-      g: this.totalGold, rc: this.rebirthCount, rr: this.rebirthReq,
-      tc: this.totalClicks, u: this.upgradeList.map(i => i.owned),
-      ri: this.rebirthItems.map(i => i.owned),
-      a: this.achievements.map(a => a.unlocked ? 1 : 0),
-      t: Date.now()
-    };
-    storage.set({ key: 'mine_v2_slot_' + this.currentSaveSlot, value: JSON.stringify(data) });
-    this.updateSlotsInfo();
-  },
-  loadData() {
-    storage.get({
-      key: 'mine_v2_slot_' + this.currentSaveSlot,
-      success: (res) => {
-        if (res) {
-          try {
-            const d = JSON.parse(res);
-            this.totalGold = d.g || 0; this.rebirthCount = d.rc || 0; this.rebirthReq = d.rr || 10000;
-            this.totalClicks = d.tc || 0;
-            if (d.u) d.u.forEach((val, i) => { if(this.upgradeList[i]) { this.upgradeList[i].owned = val; this.upgradeList[i].price = Math.ceil(this.upgradeList[i].basePrice * Math.pow(1.15, val)); } });
-            if (d.ri) d.ri.forEach((val, i) => { if(this.rebirthItems[i]) { this.rebirthItems[i].owned = val; let p = this.rebirthItems[i].basePrice; for(let k=0; k<val; k++) p = Math.ceil(p*1.5); this.rebirthItems[i].price = p; } });
-            if (d.a) d.a.forEach((val, i) => { if(this.achievements[i]) this.achievements[i].unlocked = (val === 1); });
-            
-            this.recalculateStats();
-            this.checkAchievements();
-            
-            // Offline Calc
-            if (d.t) {
-              const now = Date.now();
-              const diffSeconds = (now - d.t) / 1000;
-              if (diffSeconds > 60 && this.gps > 0) {
-                 const earned = Math.floor(diffSeconds * this.gps);
-                 this.totalGold += earned;
-                 this.showModal(this.t.welcomeBack, `${this.t.offlineTime}: ${this.formatTime(diffSeconds)}\n+${this.formatPrice(earned)}`);
-              }
-            }
-          } catch(e) {}
-        }
-        this.dataLoaded = true;
-      },
-      fail: () => { this.dataLoaded = true; }
-    });
-  },
-  updateSlotsInfo() {
-    [0, 1, 2].forEach(i => {
-       storage.get({ key: 'mine_v2_slot_' + i, success: (res) => {
-         if (res) {
-             let d = JSON.parse(res);
-             this.slotsInfo[i] = { g: this.formatPrice(d.g), r: d.rc };
-         } else { this.slotsInfo[i] = null; }
-         this.slotsInfo = [...this.slotsInfo];
-       }});
-    });
-  },
-  switchSlot(idx) {
-    if (this.currentSaveSlot === idx) return;
+  switchSlot(index) {
+    if (this.currentSaveSlot === index) return;
     this.saveData(); 
-    this.currentSaveSlot = idx;
-    this.totalGold=0; this.gps=0; this.rebirthCount=0; this.upgradeList.forEach(i=>{i.owned=0;i.price=i.basePrice}); this.achievements.forEach(a=>a.unlocked=false);
+    
+    this.totalGold = 0;
+    this.gps = 0;
+    this.clickPower = 1;
+    this.rebirthCount = 0;
+    this.rebirthReq = 10000;
+    this.upgradeList.forEach(i => { i.owned = 0; i.price = i.basePrice; });
+    this.rebirthItems.forEach(i => { i.owned = 0; i.price = i.basePrice; });
+    this.achievements.forEach(a => a.unlocked = false);
+    
+    this.currentSaveSlot = index;
     this.loadData();
   },
+
   handleResetClick() {
     this.resetClickCount--;
     if (this.resetClickCount <= 0) {
-      storage.delete({ key: 'mine_v2_slot_' + this.currentSaveSlot });
-      this.totalGold=0; this.gps=0; this.rebirthCount=0; this.upgradeList.forEach(i=>{i.owned=0;i.price=i.basePrice}); this.achievements.forEach(a=>a.unlocked=false);
-      this.recalculateStats();
-      this.resetClickCount = 10;
-      prompt.showToast({message: "Reset Done"});
+      storage.delete({
+        key: 'mine_save_slot_' + this.currentSaveSlot,
+        success: () => {
+          prompt.showToast({ message: this.t.msgResetDone });
+          this.totalGold = 0;
+          this.gps = 0;
+          this.clickPower = 1;
+          this.rebirthCount = 0;
+          this.rebirthReq = 10000;
+          this.upgradeList.forEach(i => { i.owned = 0; i.price = i.basePrice; });
+          this.rebirthItems.forEach(i => { i.owned = 0; i.price = i.basePrice; });
+          this.achievements.forEach(a => a.unlocked = false);
+          this.recalculateStats();
+          this.resetClickCount = 10;
+          this.updateSlotsInfo();
+        }
+      });
     }
   },
   
-  showModal(t, m) { this.modal = {visible: true, title: t, message: m}; },
-  closeModal() { this.modal.visible = false; }
+  updateSlotsInfo() {
+    [0, 1, 2].forEach(i => {
+      storage.get({
+        key: 'mine_save_slot_' + i,
+        success: (res) => {
+          if (res) {
+            try {
+              const d = JSON.parse(res);
+              this.slotsInfo[i] = {
+                empty: false,
+                summary: `R:${d.rc || 0} / ${this.formatPrice(d.g || 0)}`,
+                date: new Date(d.t || Date.now()).toLocaleString()
+              };
+            } catch(e) { this.slotsInfo[i] = null; }
+          } else {
+            this.slotsInfo[i] = null;
+          }
+        }
+      });
+    });
+  },
+
+  openDonate() { this.showDonate = true; },
+  closeDonate() { this.showDonate = false; },
+  showModal(title, msg) {
+    this.modal = { visible: true, title: title, message: msg };
+  },
+  closeModal() {
+    this.modal.visible = false;
+  }
 }
 </script>
