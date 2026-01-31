@@ -427,7 +427,7 @@ import brightness from '@system.brightness'
 
 const I18N = {
   'zh-CN': {
-    pps: '秒产', rebirth: '重生', req: '花费', // 修復翻譯
+    pps: '秒产', rebirth: '重生', req: '花费',
     equipShop: '设备采购',
     auto: '自动', manual: '手动', shop: '商店', settings: '设置',
     sysSettings: '系统设置', achTitle: '成就列表', deleteSave: '删除存档',
@@ -453,17 +453,19 @@ const I18N = {
     item_crown: '永恒王冠', desc_crown: '全局收益 +100%',
 
     item_pick: '生锈镐头', item_bird: '金丝雀', item_drill: '蒸汽钻头', item_miner: '初级矿工',
-    item_cart: '矿车队', item_excavator: '挖掘机', item_tnt: '炸药专家', item_laser: '雷射钻井',
+    item_cart: '矿车队', item_excavator: '挖掘机', item_tnt: '炸药专家', 
+    item_steam_engine: '蒸汽引擎', item_laser: '雷射钻井', item_nuclear: '核能发电机',
     item_quantum: '量子核心', item_nano: '纳米机器人', item_ai: 'AI 矿工', item_fusion: '冷核聚变',
-    item_hole: '黑洞开采', item_dimension: '维度撕裂者',
-    item_antimatter: '反物质泵', item_galaxy: '指尖星系', item_time: '时间膨胀机', item_universe: '掌中宇宙',
-    item_supernova: '超新星爆发', item_black_prism: '黑光棱镜',
-    item_god_hand: '创世之手', item_creation: '大爆炸引擎',
+    item_plasma: '等离子切割', item_hole: '黑洞开采', item_dimension: '维度撕裂者',
+    item_antimatter: '反物质泵', item_galaxy: '指尖星系', item_nebula_harvester: '星云收割机',
+    item_time: '时间膨胀机', item_universe: '掌中宇宙', item_supernova: '超新星爆发',
+    item_black_prism: '黑光棱镜', item_god_hand: '创世之手', item_creation: '大爆炸引擎',
     item_star_forge: '恒星锻造厂', item_logic_gate: '因果律逻辑门',
     item_dyson: '戴森球矩阵', item_darkmatter: '暗能量收割', 
     item_spacetime_tear: '时空裂缝发电机', item_void_engine: '虚空引擎',
-    item_dimension_x: '第十一维度', item_omniverse: '全能宇宙核心', 
-    item_creator: '造物主之笔', item_end: '终焉之刻',
+    item_parallel_will: '平行意志', item_dimension_x: '第十一维度', 
+    item_multiverse_relay: '多元宇宙中继', item_omniverse: '全能宇宙核心', 
+    item_concept_core: '概念核心', item_creator: '造物主之笔', item_end: '终焉之刻',
 
     item_void_pickaxe: '虚空镐', item_star_eater: '吞星者',
     item_existence_eraser: '存在抹除', item_reality_anchor: '现实锚点',
@@ -502,17 +504,19 @@ const I18N = {
     item_crown: '永恆王冠', desc_crown: '全局收益 +100%',
 
     item_pick: '生鏽鎬頭', item_bird: '金絲雀', item_drill: '蒸汽鑽頭', item_miner: '初級礦工',
-    item_cart: '礦車隊', item_excavator: '挖掘機', item_tnt: '炸藥專家', item_laser: '雷射鑽井',
+    item_cart: '礦車隊', item_excavator: '挖掘機', item_tnt: '炸藥專家', 
+    item_steam_engine: '蒸汽引擎', item_laser: '雷射鑽井', item_nuclear: '核能發電機',
     item_quantum: '量子核心', item_nano: '奈米機器人', item_ai: 'AI 礦工', item_fusion: '冷核聚變',
-    item_hole: '黑洞開採', item_dimension: '維度撕裂者',
-    item_antimatter: '反物質泵', item_galaxy: '指尖星系', item_time: '時間膨脹機', item_universe: '掌中宇宙',
-    item_supernova: '超新星爆發', item_black_prism: '黑光棱鏡',
-    item_god_hand: '創世之手', item_creation: '大爆炸引擎',
+    item_plasma: '等離子切割', item_hole: '黑洞開採', item_dimension: '維度撕裂者',
+    item_antimatter: '反物質泵', item_galaxy: '指尖星系', item_nebula_harvester: '星雲收割機',
+    item_time: '時間膨脹機', item_universe: '掌中宇宙', item_supernova: '超新星爆發',
+    item_black_prism: '黑光棱鏡', item_god_hand: '創世之手', item_creation: '大爆炸引擎',
     item_star_forge: '恆星鍛造廠', item_logic_gate: '因果律邏輯門',
     item_dyson: '戴森球矩陣', item_darkmatter: '暗能量收割', 
     item_spacetime_tear: '時空裂縫發電機', item_void_engine: '虛空引擎',
-    item_dimension_x: '第十一維度', item_omniverse: '全能宇宙核心', 
-    item_creator: '造物主之筆', item_end: '終焉之刻',
+    item_parallel_will: '平行意志', item_dimension_x: '第十一維度', 
+    item_multiverse_relay: '多元宇宙中繼', item_omniverse: '全能宇宙核心', 
+    item_concept_core: '概念核心', item_creator: '造物主之筆', item_end: '終焉之刻',
 
     item_void_pickaxe: '虛空鎬', item_star_eater: '吞星者',
     item_existence_eraser: '存在抹除', item_reality_anchor: '現實錨點',
@@ -591,46 +595,67 @@ export default {
       { id: 'rb_5', key: 'ach_rebirth_5', name: '', condition: (d) => d.rebirthCount >= 5, unlocked: false }
     ],
     
-    upgradeList: [
+        upgradeList: [
+      // 10 ~ 1k
       { key: 'item_pick', name: "", basePrice: 15, price: 15, owned: 0, power: 1, type: 'click' },
-      { key: 'item_bird', name: "", basePrice: 100, price: 100, owned: 0, power: 2, type: 'gps' },
-      { key: 'item_drill', name: "", basePrice: 500, price: 500, owned: 0, power: 10, type: 'click' },
-      { key: 'item_miner', name: "", basePrice: 1000, price: 1000, owned: 0, power: 15, type: 'gps' },
-      { key: 'item_cart', name: "", basePrice: 5000, price: 5000, owned: 0, power: 60, type: 'click' },
-      { key: 'item_excavator', name: "", basePrice: 15000, price: 15000, owned: 0, power: 120, type: 'gps' },
-      { key: 'item_tnt', name: "", basePrice: 50000, price: 50000, owned: 0, power: 400, type: 'click' },
-      { key: 'item_laser', name: "", basePrice: 200000, price: 200000, owned: 0, power: 1500, type: 'gps' },
-      { key: 'item_quantum', name: "", basePrice: 1000000, price: 1000000, owned: 0, power: 8000, type: 'click' },
-      { key: 'item_nano', name: "", basePrice: 50000000, price: 50000000, owned: 0, power: 300000, type: 'gps' },
-      { key: 'item_ai', name: "", basePrice: 250000000, price: 250000000, owned: 0, power: 2000000, type: 'click' },
-      { key: 'item_fusion', name: "", basePrice: 1000000000, price: 1000000000, owned: 0, power: 10000000, type: 'gps' },
-      { key: 'item_hole', name: "", basePrice: 5000000000, price: 5000000000, owned: 0, power: 50000000, type: 'click' },
-      { key: 'item_dimension', name: "", basePrice: 25000000000, price: 25000000000, owned: 0, power: 300000000, type: 'gps' },
-      { key: 'item_antimatter', name: "", basePrice: 100000000000, price: 100000000000, owned: 0, power: 1000000000, type: 'click' },
-      { key: 'item_galaxy', name: "", basePrice: 500000000000, price: 500000000000, owned: 0, power: 8000000000, type: 'gps' },
-      { key: 'item_time', name: "", basePrice: 2500000000000, price: 2500000000000, owned: 0, power: 50000000000, type: 'click' },
-      { key: 'item_universe', name: "", basePrice: 10000000000000, price: 10000000000000, owned: 0, power: 250000000000, type: 'gps' },
-      { key: 'item_supernova', name: "", basePrice: 50000000000000, price: 50000000000000, owned: 0, power: 1000000000000, type: 'click' },
-      { key: 'item_black_prism', name: "", basePrice: 250000000000000, price: 250000000000000, owned: 0, power: 10000000000000, type: 'gps' },
-      { key: 'item_god_hand', name: "", basePrice: 1000000000000000, price: 1000000000000000, owned: 0, power: 50000000000000, type: 'click' },
-      { key: 'item_creation', name: "", basePrice: 5000000000000000, price: 5000000000000000, owned: 0, power: 250000000000000, type: 'gps' },
-      { key: 'item_star_forge', name: "", basePrice: 20000000000000000, price: 20000000000000000, owned: 0, power: 1000000000000000, type: 'click' },
-      { key: 'item_logic_gate', name: "", basePrice: 100000000000000000, price: 100000000000000000, owned: 0, power: 5000000000000000, type: 'gps' },
-      { key: 'item_dyson', name: "", basePrice: 500000000000000000, price: 500000000000000000, owned: 0, power: 20000000000000000, type: 'click' },
-      { key: 'item_darkmatter', name: "", basePrice: 2500000000000000000, price: 2500000000000000000, owned: 0, power: 120000000000000000, type: 'gps' },
-      { key: 'item_spacetime_tear', name: "", basePrice: 10000000000000000000, price: 10000000000000000000, owned: 0, power: 500000000000000000, type: 'click' },
-      { key: 'item_void_engine', name: "", basePrice: 50000000000000000000, price: 50000000000000000000, owned: 0, power: 2500000000000000000, type: 'gps' },
-      { key: 'item_dimension_x', name: "", basePrice: 500000000000000000000000000000, price: 500000000000000000000000000000, owned: 0, power: 2500000000000000000000000000, type: 'click' },
-      { key: 'item_omniverse', name: "", basePrice: 2500000000000000000000000000000, price: 2500000000000000000000000000000, owned: 0, power: 12000000000000000000000000000, type: 'gps' },
-      { key: 'item_creator', name: "", basePrice: 10000000000000000000000000000000, price: 10000000000000000000000000000000, owned: 0, power: 50000000000000000000000000000, type: 'click' },
-      { key: 'item_end', name: "", basePrice: 100000000000000000000000000000000, price: 100000000000000000000000000000000, owned: 0, power: 50000000000000000000000000000, type: 'gps' },
+      { key: 'item_bird', name: "", basePrice: 80, price: 80, owned: 0, power: 3, type: 'gps' },
+      { key: 'item_drill', name: "", basePrice: 400, price: 400, owned: 0, power: 12, type: 'click' },
+      { key: 'item_miner', name: "", basePrice: 1500, price: 1500, owned: 0, power: 30, type: 'gps' },
       
-      { key: 'item_void_pickaxe', name: "", basePrice: 500000000000000000000000000000000, price: 500000000000000000000000000000000, owned: 0, power: 2500000000000000000000000000000, type: 'click' },
-      { key: 'item_star_eater', name: "", basePrice: 2000000000000000000000000000000000, price: 2000000000000000000000000000000000, owned: 0, power: 10000000000000000000000000000000, type: 'gps' },
-      { key: 'item_existence_eraser', name: "", basePrice: 10000000000000000000000000000000000, price: 10000000000000000000000000000000000, owned: 0, power: 50000000000000000000000000000000, type: 'click' },
-      { key: 'item_reality_anchor', name: "", basePrice: 50000000000000000000000000000000000, price: 50000000000000000000000000000000000, owned: 0, power: 250000000000000000000000000000000, type: 'gps' },
-      { key: 'item_true_infinity', name: "", basePrice: 250000000000000000000000000000000000, price: 250000000000000000000000000000000000, owned: 0, power: 1200000000000000000000000000000000, type: 'click' },
-      { key: 'item_the_author', name: "", basePrice: 1000000000000000000000000000000000000, price: 1000000000000000000000000000000000000, owned: 0, power: 5000000000000000000000000000000000, type: 'gps' }
+      // 1k ~ 100k
+      { key: 'item_cart', name: "", basePrice: 6000, price: 6000, owned: 0, power: 100, type: 'click' },
+      { key: 'item_excavator', name: "", basePrice: 20000, price: 20000, owned: 0, power: 250, type: 'gps' },
+      { key: 'item_tnt', name: "", basePrice: 75000, price: 75000, owned: 0, power: 800, type: 'click' },
+      { key: 'item_steam_engine', name: "", basePrice: 250000, price: 250000, owned: 0, power: 1800, type: 'gps' },
+      
+      // 1M ~ 100M
+      { key: 'item_laser', name: "", basePrice: 850000, price: 850000, owned: 0, power: 5000, type: 'click' },
+      { key: 'item_nuclear', name: "", basePrice: 3000000, price: 3000000, owned: 0, power: 15000, type: 'gps' },
+      { key: 'item_quantum', name: "", basePrice: 10000000, price: 10000000, owned: 0, power: 45000, type: 'click' },
+      { key: 'item_nano', name: "", basePrice: 40000000, price: 40000000, owned: 0, power: 180000, type: 'gps' },
+      
+      // 100M ~ 100B
+      { key: 'item_ai', name: "", basePrice: 150000000, price: 150000000, owned: 0, power: 600000, type: 'click' },
+      { key: 'item_fusion', name: "", basePrice: 600000000, price: 600000000, owned: 0, power: 2200000, type: 'gps' },
+      { key: 'item_plasma', name: "", basePrice: 2000000000, price: 2000000000, owned: 0, power: 7500000, type: 'click' },
+      { key: 'item_hole', name: "", basePrice: 8000000000, price: 8000000000, owned: 0, power: 25000000, type: 'gps' },
+      { key: 'item_dimension', name: "", basePrice: 35000000000, price: 35000000000, owned: 0, power: 90000000, type: 'click' },
+      
+      // 100B ~ 100T
+      { key: 'item_antimatter', name: "", basePrice: 150000000000, price: 150000000000, owned: 0, power: 400000000, type: 'gps' },
+      { key: 'item_galaxy', name: "", basePrice: 600000000000, price: 600000000000, owned: 0, power: 1500000000, type: 'click' },
+      { key: 'item_nebula_harvester', name: "", basePrice: 2000000000000, price: 2000000000000, owned: 0, power: 5000000000, type: 'gps' },
+      { key: 'item_time', name: "", basePrice: 8000000000000, price: 8000000000000, owned: 0, power: 20000000000, type: 'click' },
+      { key: 'item_universe', name: "", basePrice: 30000000000000, price: 30000000000000, owned: 0, power: 80000000000, type: 'gps' },
+      
+      // 100T ~ 100 Quadrillion
+      { key: 'item_supernova', name: "", basePrice: 150000000000000, price: 150000000000000, owned: 0, power: 300000000000, type: 'click' },
+      { key: 'item_black_prism', name: "", basePrice: 600000000000000, price: 600000000000000, owned: 0, power: 1200000000000, type: 'gps' },
+      { key: 'item_god_hand', name: "", basePrice: 2500000000000000, price: 2500000000000000, owned: 0, power: 5000000000000, type: 'click' },
+      { key: 'item_creation', name: "", basePrice: 10000000000000000, price: 10000000000000000, owned: 0, power: 20000000000000, type: 'gps' },
+      { key: 'item_star_forge', name: "", basePrice: 40000000000000000, price: 40000000000000000, owned: 0, power: 80000000000000, type: 'click' },
+      
+      // ... 以此類推，保持 3-5 倍增長直到終點
+      { key: 'item_logic_gate', name: "", basePrice: 150000000000000000, price: 150000000000000000, owned: 0, power: 300000000000000, type: 'gps' },
+      { key: 'item_dyson', name: "", basePrice: 600000000000000000, price: 600000000000000000, owned: 0, power: 1200000000000000, type: 'click' },
+      { key: 'item_darkmatter', name: "", basePrice: 2500000000000000000, price: 2500000000000000000, owned: 0, power: 5000000000000000, type: 'gps' },
+      { key: 'item_spacetime_tear', name: "", basePrice: 10000000000000000000, price: 10000000000000000000, owned: 0, power: 20000000000000000, type: 'click' },
+      { key: 'item_void_engine', name: "", basePrice: 40000000000000000000, price: 40000000000000000000, owned: 0, power: 80000000000000000, type: 'gps' },
+      { key: 'item_parallel_will', name: "", basePrice: 150000000000000000000, price: 150000000000000000000, owned: 0, power: 300000000000000000, type: 'click' },
+      { key: 'item_dimension_x', name: "", basePrice: 600000000000000000000, price: 600000000000000000000, owned: 0, power: 1200000000000000000, type: 'gps' },
+      { key: 'item_multiverse_relay', name: "", basePrice: 2500000000000000000000, price: 2500000000000000000000, owned: 0, power: 5000000000000000000, type: 'click' },
+      { key: 'item_omniverse', name: "", basePrice: 10000000000000000000000, price: 10000000000000000000000, owned: 0, power: 20000000000000000000, type: 'gps' },
+      { key: 'item_concept_core', name: "", basePrice: 40000000000000000000000, price: 40000000000000000000000, owned: 0, power: 80000000000000000000, type: 'click' },
+      { key: 'item_creator', name: "", basePrice: 150000000000000000000000, price: 150000000000000000000000, owned: 0, power: 300000000000000000000, type: 'gps' },
+      { key: 'item_end', name: "", basePrice: 600000000000000000000000, price: 600000000000000000000000, owned: 0, power: 1200000000000000000000, type: 'click' },
+
+      // 超越階段
+      { key: 'item_void_pickaxe', name: "", basePrice: 2500000000000000000000000, price: 2500000000000000000000000, owned: 0, power: 5000000000000000000000, type: 'gps' },
+      { key: 'item_star_eater', name: "", basePrice: 10000000000000000000000000, price: 10000000000000000000000000, owned: 0, power: 20000000000000000000000, type: 'click' },
+      { key: 'item_existence_eraser', name: "", basePrice: 40000000000000000000000000, price: 40000000000000000000000000, owned: 0, power: 80000000000000000000000, type: 'gps' },
+      { key: 'item_reality_anchor', name: "", basePrice: 150000000000000000000000000, price: 150000000000000000000000000, owned: 0, power: 300000000000000000000000, type: 'click' },
+      { key: 'item_true_infinity', name: "", basePrice: 600000000000000000000000000, price: 600000000000000000000000000, owned: 0, power: 1200000000000000000000000, type: 'gps' },
+      { key: 'item_the_author', name: "", basePrice: 2500000000000000000000000000, price: 2500000000000000000000000000, owned: 0, power: 5000000000000000000000000, type: 'click' }
     ],
 
     rebirthItems: [
